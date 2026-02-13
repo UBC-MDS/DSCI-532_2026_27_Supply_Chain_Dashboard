@@ -65,5 +65,6 @@
 > **Reflection:** This finding supports the need for a targeted filter in the dashboard. By allowing the policy maker to isolate "Young Adults," they can investigate if this high trend holds true across different clinic locations, helping them decide if age-specific text message reminders are needed.
 
 ## Section 5: App Sketch & Description
+Below is a sketch of what the dashboard could look like with a first draft of the metrics we want to include:
 
 ![Sketch](../img/sketch.png "App Sketch")
