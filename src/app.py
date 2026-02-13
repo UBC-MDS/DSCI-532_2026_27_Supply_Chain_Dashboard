@@ -1,3 +1,5 @@
+# Adapted from code/lecture02/core/app-01-ui.py
+
 from shiny import App, ui
 
 # UI
