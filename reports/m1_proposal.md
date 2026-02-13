@@ -66,6 +66,4 @@
 
 ## Section 5: App Sketch & Description
 
-![Dashboard](sketch.png "App Sketch")
-
-> ...
+![Sketch](../img/sketch.png "App Sketch")
