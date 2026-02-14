@@ -1,0 +1,14 @@
+name: supply-app
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python>=3.12
+  - pandas>=3.0
+  - plotly>=6.5
+  - seaborn>=0.13
+  - pip
+  - pip:
+    - shiny>=1.5
+    - shinywidgets>=0.7
+    - ridgeplot>=0.3
