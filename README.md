@@ -10,21 +10,21 @@ This interactive dashboard empowers supply chain managers in the fashion and bea
 
 1. Clone this repository:
 ```bash
-git clone https://github.com/UBC-MDS/DSCI-532_2026_27_TBD.git
-cd DSCI-532_2026_27_TBD
+git clone git@github.com:UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard.git
+cd DSCI-532_2026_27_Supply_Chain_Dashboard
 ```
 
 2. Create and activate the conda environment:
 ```bash
 conda env create -f environment.yml
-conda activate supply-chain-dashboard
+conda activate supply-app
 ```
 
 ### Running the Dashboard Locally
 
 ```bash
 cd src
-python app.py
+shiny run app.py
 ```
 
 The dashboard will be available at `http://localhost:8000`
@@ -45,7 +45,7 @@ Please note that this project is released with a [Code of Conduct](CODE_OF_CONDU
 
 ## Team
 
-- roccolee18
-- amanbinepal
-- junliliu1
-- gaurang23
+- Rocco Lee (roccolee18)
+- Amanpreet Binepal (amanbinepal)
+- Junli Liu (junliliu1)
+- Gaurang Ahuja (gaurang23)
