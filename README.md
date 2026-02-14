@@ -48,3 +48,4 @@ Please note that this project is released with a [Code of Conduct](CODE_OF_CONDU
 - roccolee18
 - amanbinepal
 - junliliu1
+- gaurang23
