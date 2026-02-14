@@ -24,7 +24,7 @@ conda activate supply-chain-dashboard
 
 ```bash
 cd src
-python app.py
+shiny run app.py
 ```
 
 The dashboard will be available at `http://localhost:8000`
