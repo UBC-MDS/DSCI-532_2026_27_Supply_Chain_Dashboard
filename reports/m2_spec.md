@@ -44,3 +44,25 @@ flowchart TD
 ```
 
 ![Reactivity Diagram](../img/m2_reactivity_diagram.png)
+
+## 2.4 Calculation Details
+
+### `filtered_data` (Reactive Calc)
+
+**Depends on:**
+- `input_transport_mode`: Checkbox group for transportation modes (Road, Rail, Air, Sea)
+- `input_product_type`: Dropdown select for product types (All, haircare, skincare, cosmetics)
+- `input_supplier`: Dropdown select for suppliers (All, Supplier 1, Supplier 2, Supplier 3, Supplier 4, Supplier 5)
+
+**Transformation:**
+Filters the supply chain dataset based on selected transportation modes, product types, and suppliers. Returns a pandas DataFrame subset that matches all active filter criteria.
+
+**Consumed by:**
+- `plot_shipping_cost`: Bar chart showing average shipping costs by transportation mode
+- `plot_defect_rate`: Scatter plot showing defect rates by SKU colored by supplier
+- `plot_customer_demo`: Pie chart showing customer demographics distribution
+- `value_total_revenue`: Value box displaying sum of filtered revenue
+
+**Efficiency Note:**
+This single reactive calc ensures data is filtered once per user interaction, not 4 separate times for each output, following best practices from Lecture 3.
+
