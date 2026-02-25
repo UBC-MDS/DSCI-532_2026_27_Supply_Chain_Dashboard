@@ -28,3 +28,19 @@
 - At least one `@reactive.calc` depending on 2+ inputs: `filtered_data` depends on 3 inputs
 - At least 2 outputs consuming the same calc: 4 outputs all consume `filtered_data`
 - All outputs depend on at least one reactive input: All outputs depend on `filtered_data` which depends on user inputs
+
+## 2.3 Reactivity Diagram
+
+```mermaid
+flowchart TD
+    A[/input_transport_mode/] --> F{{filtered_data}}
+    B[/input_product_type/] --> F
+    C[/input_supplier/] --> F
+
+    F --> P1([plot_shipping_cost])
+    F --> P2([plot_defect_rate])
+    F --> P3([plot_customer_demo])
+    F --> V1([value_total_revenue])
+```
+
+![Reactivity Diagram](../img/m2_reactivity_diagram.png)
