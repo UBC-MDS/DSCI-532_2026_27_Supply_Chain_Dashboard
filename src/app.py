@@ -92,6 +92,9 @@ app_ui = ui.page_fillable(
                 "Supplier",
                 ["All"] + sorted(df["Supplier name"].unique().tolist()),
             ),
+            ui.hr(),
+            ui.download_button("download_all",  "⬇ All data", class_="btn-secondary"),
+            ui.download_button("download_view", "⬇ Filtered view", class_="btn-primary"),
             open="desktop",
         ),
         ui.layout_columns(
@@ -155,6 +158,14 @@ def server(input, output, session):
             df_copy["Transportation modes"].isin(input.input_transport_mode())
         ]
         return df_copy
+    
+    @render.download(filename="supply_chain_all.csv")
+    def download_all():
+        yield df.to_csv(index=False)
+
+    @render.download(filename="supply_chain_filtered.csv")
+    def download_view():
+        yield filtered_data().to_csv(index=False)
 
     # Heatmap
     @render_altair
