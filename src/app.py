@@ -62,7 +62,14 @@ def kpi_showcase(cmp):
     """FA icon sized for the value-box showcase panel — inherits theme colour."""
     # fill defaults to currentColor, so the icon matches the box's text colour
     # fill_opacity softens it slightly so it doesn't overpower the value
-    return icon_svg(cmp["icon"], height="1em", fill_opacity="0.85")
+    return icon_svg(cmp["icon"], height="0.75em", fill_opacity="0.85")
+
+def kpi_caption(cmp):
+    """Delta badge + five-state label rendered below the value."""
+    return ui.tags.div(
+        # bold first line: absolute + relative delta, e.g. "+5.6 (+24.3%) vs overall avg"
+        ui.HTML(f'<strong style="opacity:0.9">{cmp["badge"]}</strong>'),
+    )
 
 app_ui = ui.page_fillable(
     ui.panel_title("Supply Chain Dashboard"),
@@ -254,8 +261,9 @@ def server(input, output, session):
         val = filtered_data()["Manufacturing costs"].mean()
         cmp = compare(val, BASELINE["cost"], higher_is_better=False)
         return ui.value_box(
-            "Avg. Cost per Unit", f"${val:.2f}",
+            "Avg. Cost per Unit", f"${val:.2f}", kpi_caption(cmp),
             showcase=kpi_showcase(cmp),
+            showcase_layout="top right",
             theme=cmp["theme"],
         )
 
@@ -264,8 +272,9 @@ def server(input, output, session):
         val = (filtered_data()["Inspection results"] == "Pass").mean() * 100
         cmp = compare(val, BASELINE["pass_rate"], higher_is_better=True)
         return ui.value_box(
-            "Inspection Pass Rate", f"{val:.1f}%",
+            "Inspection Pass Rate", f"{val:.1f}%", kpi_caption(cmp),
             showcase=kpi_showcase(cmp),
+            showcase_layout="top right",
             theme=cmp["theme"],
         )
 
