@@ -6,3 +6,4 @@ pip
 shiny>=0.10.0
 shinywidgets>=0.3.0
 ridgeplot>=0.3
+faicons
