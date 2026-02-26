@@ -3,6 +3,7 @@ from shinywidgets import output_widget, render_altair
 import pandas as pd
 import altair as alt
 from datetime import date
+from faicons import icon_svg
 
 # Load data globally
 df = pd.read_csv("data/raw/supply_chain_data.csv")
@@ -10,6 +11,58 @@ df = pd.read_csv("data/raw/supply_chain_data.csv")
 # Colorblind-friendly palette (Okabe-Ito)
 # Blue, Orange, Green, Pink, Yellow, Light Blue, Light Orange
 CP = ["#0072B2", "#D55E00", "#009E73", "#CC79A7", "#F0E442", "#56B4E9", "#E69F00"]
+BASELINE = {
+    "cost": df["Manufacturing costs"].mean(),
+    "pass_rate": (df["Inspection results"] == "Pass").mean() * 100,
+}
+
+def compare(current, baseline, higher_is_better=True):
+    """
+    Classify current vs baseline — five states:
+      significantly above / slightly above / stable / slightly below / significantly below
+    Thresholds:  change < 1%: stable, 1–5%: slight, > 5%: significant
+    """
+    # guard: can't compute a meaningful delta
+    if baseline == 0 or pd.isna(current):
+        return dict(icon="circle-minus", theme="secondary", badge="no data", label="no data")
+
+    # percentage change relative to baseline; sign tells direction
+    pct = (current - baseline) / abs(baseline) * 100
+
+    # "good" depends on context: higher MPG is good, lower HP is good for efficiency
+    is_good = (pct > 0) if higher_is_better else (pct < 0)
+    abs_pct = abs(pct)
+
+    # badge string shown below the value: e.g. "+5.6 (+24.3%) vs overall avg"
+    sign = "+" if pct >= 0 else ""
+    badge = f"{sign}{current - baseline:.1f} ({sign}{pct:.1f}%) vs overall avg"
+
+    # under 1% change — treat as noise, no colour signal
+    if abs_pct < 1:
+        return dict(icon="arrow-right", theme="secondary", badge="≈ stable vs overall avg", label="stable")
+
+    # direction: matching FA icon
+    icon = "arrow-trend-up" if pct > 0 else "arrow-trend-down"
+
+    # colour: good changes are green (success ≥5%, teal <5%),
+    #         bad changes are red (danger ≥5%, warning <5%)
+    theme = (
+        "success" if (is_good and abs_pct >= 5) else
+        "teal"    if is_good                    else
+        "danger"  if abs_pct >= 5               else
+        "warning"
+    )
+
+    quantifier = "significantly" if abs_pct >= 5 else "slightly"
+    return dict(icon=icon, theme=theme, badge=badge,
+                label=f"{quantifier} {'above' if pct > 0 else 'below'} avg")
+
+
+def kpi_showcase(cmp):
+    """FA icon sized for the value-box showcase panel — inherits theme colour."""
+    # fill defaults to currentColor, so the icon matches the box's text colour
+    # fill_opacity softens it slightly so it doesn't overpower the value
+    return icon_svg(cmp["icon"], height="1em", fill_opacity="0.85")
 
 app_ui = ui.page_fillable(
     ui.panel_title("Supply Chain Dashboard"),
@@ -57,16 +110,8 @@ app_ui = ui.page_fillable(
                     ui.card_header("Stock Availability"),
                     output_widget("plot_availability"),
                 ),
-                ui.value_box(
-                    "Avg. Cost per Unit",
-                    ui.output_text("value_cost_unit"),
-                    theme="info",
-                ),
-                ui.value_box(
-                    "Inspection Pass Rate",
-                    ui.output_text("value_pass_rate"),
-                    theme="success",
-                ),
+                ui.output_ui("value_cost_unit"),
+                ui.output_ui("value_pass_rate"),
                 col_widths=[6, 6, 6, 6],
             ),
             # QUADRANT 4: Quality Analysis
@@ -199,14 +244,25 @@ def server(input, output, session):
         )
 
     # KPI
-    @render.text
+    @render.ui
     def value_cost_unit():
-        return f"${filtered_data()['Manufacturing costs'].mean():.2f}"
+        val = filtered_data()["Manufacturing costs"].mean()
+        cmp = compare(val, BASELINE["cost"], higher_is_better=False)
+        return ui.value_box(
+            "Avg. Cost per Unit", f"${val:.2f}",
+            showcase=kpi_showcase(cmp),
+            theme=cmp["theme"],
+        )
 
-    @render.text
+    @render.ui
     def value_pass_rate():
         val = (filtered_data()["Inspection results"] == "Pass").mean() * 100
-        return f"{val:.1f}%"
+        cmp = compare(val, BASELINE["pass_rate"], higher_is_better=True)
+        return ui.value_box(
+            "Inspection Pass Rate", f"{val:.1f}%",
+            showcase=kpi_showcase(cmp),
+            theme=cmp["theme"],
+        )
 
     # Defect Rate Scatter plot
     @render_altair
