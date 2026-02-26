@@ -124,7 +124,12 @@ app_ui = ui.page_fillable(
         ),
         ui.hr(),
         ui.layout_columns(
-            ui.markdown(f"**Group Project** | **Last Updated:** {date.today()}"),
+            ui.markdown(
+                f"**Supply Chain Dashboard** - Managing costs, demographics, and quality control | "
+                f"**Authors:** Rocco Lee, Gaurang Ahuja, Junli Liu, Amanpreet Binepal | "
+                f"[Github](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard) | "
+                f"**Last Updated:** {date.today()}"
+                ),
         ),
     ),
 )
