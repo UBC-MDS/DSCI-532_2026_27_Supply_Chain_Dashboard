@@ -1,15 +1,6 @@
-name: supply-app
+name: supply-app-test
 channels:
   - conda-forge
   - defaults
 dependencies:
   - python=3.12
-  - pandas>=2.2
-  - altair>=5.2
-  - plotly>=6.5
-  - seaborn>=0.13
-  - pip
-  - pip:
-      - shiny>=0.10.0
-      - shinywidgets>=0.3.0
-      - ridgeplot>=0.3
