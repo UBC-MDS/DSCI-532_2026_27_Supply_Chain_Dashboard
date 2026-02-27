@@ -243,7 +243,7 @@ def server(input, output, session):
                     alt.Tooltip("Value:Q", format=".2f", title="Avg Value"),
                 ],
             )
-            .properties(width="container", height=120)
+            .properties(width=500, height=120)
             .resolve_scale(y="independent")
         )
 
