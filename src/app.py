@@ -62,7 +62,7 @@ def kpi_showcase(cmp):
     """FA icon sized for the value-box showcase panel — inherits theme colour."""
     # fill defaults to currentColor, so the icon matches the box's text colour
     # fill_opacity softens it slightly so it doesn't overpower the value
-    return icon_svg(cmp["icon"], height="0.75em", fill_opacity="0.85")
+    return icon_svg(cmp["icon"], height="1.5em", fill_opacity="0.85")
 
 def kpi_caption(cmp):
     """Delta badge + five-state label rendered below the value."""
@@ -307,8 +307,9 @@ def server(input, output, session):
         return ui.value_box(
             "Avg. Cost per Unit", f"${val:.2f}", kpi_caption(cmp),
             showcase=kpi_showcase(cmp),
-            showcase_layout="top right",
+            showcase_layout="left center",
             theme=cmp["theme"],
+            min_height="500px",
         )
 
     @render.ui
@@ -318,8 +319,9 @@ def server(input, output, session):
         return ui.value_box(
             "Inspection Pass Rate", f"{val:.1f}%", kpi_caption(cmp),
             showcase=kpi_showcase(cmp),
-            showcase_layout="top right",
+            showcase_layout="left center",
             theme=cmp["theme"],
+            min_height="500px",
         )
 
     # Defect Rate Scatter plot
