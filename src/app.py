@@ -69,9 +69,11 @@ def kpi_caption(cmp):
     return ui.tags.div(
         # bold first line: absolute + relative delta, e.g. "+5.6 (+24.3%) vs overall avg"
         ui.HTML(f'<strong style="opacity:0.9">{cmp["badge"]}</strong>'),
+        # dimmer second line: human-readable state, e.g. "significantly above avg"
+        ui.div(cmp.get("label", ""), style="opacity:0.7;font-size:0.8rem;margin-top:2px"),
     )
 
-app_ui = ui.page_fillable(
+app_ui = ui.page_fluid(
     ui.panel_title("Supply Chain Dashboard"),
     ui.layout_sidebar(
         ui.sidebar(
@@ -98,39 +100,50 @@ app_ui = ui.page_fillable(
             open="desktop",
         ),
         ui.layout_columns(
-            # QUADRANT 1: Heatmap (Route vs Mode)
+            # TOP LEFT: KPIs
+            ui.layout_columns(
+                ui.output_ui("value_cost_unit"),
+                ui.output_ui("value_pass_rate"),
+                col_widths=[6, 6],
+            ),
+            # TOP RIGHT: Heatmap
             ui.card(
                 ui.card_header("Shipping Cost Matrix (Route vs. Mode)"),
                 output_widget("plot_route_heatmap"),
                 full_screen=True,
             ),
-            # QUADRANT 2: Faceted Bars (Cost vs Time)
-            ui.card(
-                ui.card_header("Cost vs. Time Tradeoff by Mode"),
-                output_widget("plot_cost_time_faceted"),
-                full_screen=True,
-            ),
-            # QUADRANT 3: Sub-Quadrants (2x2 Grid)
-            ui.layout_columns(
-                ui.card(
-                    ui.card_header("Customer Demographics"),
-                    output_widget("plot_customer_demo"),
-                ),
-                ui.card(
-                    ui.card_header("Stock Availability"),
-                    output_widget("plot_availability"),
-                ),
-                ui.output_ui("value_cost_unit"),
-                ui.output_ui("value_pass_rate"),
-                col_widths=[6, 6, 6, 6],
-            ),
-            # QUADRANT 4: Quality Analysis
+            # BOTTOM LEFT: Defect Rates
             ui.card(
                 ui.card_header("Defect Rates by SKU"),
                 output_widget("plot_defect_sku"),
                 full_screen=True,
             ),
-            col_widths=[6, 6, 6, 6],
+            # BOTTOM RIGHT: Mode Plot and Demographics/Availability
+            ui.layout_columns(
+                ui.card(
+                    ui.card_header("Cost vs. Time Tradeoff by Mode"),
+                    output_widget("plot_cost_time_faceted"),
+                    full_screen=True,
+                    height="400px",
+                ),
+                ui.layout_columns(
+                    ui.card(
+                        ui.card_header("Customer Demographics"),
+                        output_widget("plot_customer_demo"),
+                        full_screen=True,
+                        height="200px",
+                    ),
+                    ui.card(
+                        ui.card_header("Stock Availability"),
+                        output_widget("plot_availability"),
+                        full_screen=True,
+                        height="200px",
+                    ),
+                    col_widths=[6, 6],
+                ),
+                col_widths=[12, 12],
+            ),
+            col_widths=[6, 6, 6, 6]
         ),
         ui.hr(),
         ui.layout_columns(
@@ -189,7 +202,7 @@ def server(input, output, session):
                     alt.Tooltip("mean(Shipping costs):Q", format="$.2f"),
                 ],
             )
-            .properties(height=300, width="container")
+            .properties(width="container")
         )
 
     # Faceted Bars
@@ -230,7 +243,7 @@ def server(input, output, session):
                     alt.Tooltip("Value:Q", format=".2f", title="Avg Value"),
                 ],
             )
-            .properties(height=120, width="container")
+            .properties(width="container", height=120)
             .resolve_scale(y="independent")
         )
 
@@ -246,7 +259,7 @@ def server(input, output, session):
                 color=alt.value(CP[5]),
                 tooltip=["Customer demographics", "count()"],
             )
-            .properties(height=120, width="container")
+            .properties(width="container")
         )
 
     @render_altair
@@ -263,7 +276,7 @@ def server(input, output, session):
                     alt.Tooltip("sum(Availability):Q", title="Stock"),
                 ],
             )
-            .properties(height=120, width="container")
+            .properties(width="container")
         )
 
     # KPI
@@ -307,7 +320,7 @@ def server(input, output, session):
                     alt.Tooltip("Defect rates:Q", format=".2f"),
                 ],
             )
-            .properties(height=300, width="container")
+            .properties(width="container", height=500)
         )
 
 
