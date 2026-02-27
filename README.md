@@ -4,6 +4,10 @@
 
 This interactive dashboard empowers supply chain managers in the fashion and beauty industry to make data-driven decisions through comprehensive visualization and analysis tools. Users can explore shipping costs across transportation modes and routes, compare supplier quality metrics, and optimize inventory management. The platform enables dynamic filtering, comparative analysis, and actionable insights for operational efficiency and cost optimization.
 
+## Demo
+
+![Demo](img/demo.gif)
+
 ## Getting Started
 
 ### Installation
