@@ -75,86 +75,97 @@ def kpi_caption(cmp):
 
 app_ui = ui.page_fluid(
     ui.panel_title("Supply Chain Dashboard"),
-    ui.layout_sidebar(
-        ui.sidebar(
-            ui.h5("Global Filters"),
-            ui.input_select(
-                "input_product_type",
-                "Product Category",
-                ["All"] + sorted(df["Product type"].unique().tolist()),
-            ),
-            ui.input_checkbox_group(
-                "input_transport_mode",
-                "Transportation Mode",
-                sorted(df["Transportation modes"].unique().tolist()),
-                selected=df["Transportation modes"].unique().tolist(),
-            ),
-            ui.input_select(
-                "input_supplier",
-                "Supplier",
-                ["All"] + sorted(df["Supplier name"].unique().tolist()),
-            ),
-            ui.hr(),
-            ui.download_button("download_all",  "⬇ All data", class_="btn-secondary"),
-            ui.download_button("download_view", "⬇ Filtered view", class_="btn-primary"),
-            open="desktop",
-        ),
-        ui.layout_columns(
-            # TOP LEFT: KPIs
-            ui.layout_columns(
-                ui.output_ui("value_cost_unit"),
-                ui.output_ui("value_pass_rate"),
-                col_widths=[6, 6],
-            ),
-            # TOP RIGHT: Heatmap
-            ui.card(
-                ui.card_header("Shipping Cost Matrix (Route vs. Mode)"),
-                output_widget("plot_route_heatmap"),
-                full_screen=True,
-            ),
-            # BOTTOM LEFT: Defect Rates
-            ui.card(
-                ui.card_header("Defect Rates by SKU"),
-                output_widget("plot_defect_sku"),
-                full_screen=True,
-            ),
-            # BOTTOM RIGHT: Mode Plot and Demographics/Availability
-            ui.layout_columns(
-                ui.card(
-                    ui.card_header("Cost vs. Time Tradeoff by Mode"),
-                    output_widget("plot_cost_time_faceted"),
-                    full_screen=True,
-                    height="400px",
+    ui.navset_pill(
+        ui.nav_panel("Dashboard",
+            ui.layout_sidebar(
+                ui.sidebar(
+                    ui.h5("Global Filters"),
+                    ui.input_select(
+                        "input_product_type",
+                        "Product Category",
+                        ["All"] + sorted(df["Product type"].unique().tolist()),
+                    ),
+                    ui.input_checkbox_group(
+                        "input_transport_mode",
+                        "Transportation Mode",
+                        sorted(df["Transportation modes"].unique().tolist()),
+                        selected=df["Transportation modes"].unique().tolist(),
+                    ),
+                    ui.input_select(
+                        "input_supplier",
+                        "Supplier",
+                        ["All"] + sorted(df["Supplier name"].unique().tolist()),
+                    ),
+                    open="desktop",
                 ),
                 ui.layout_columns(
-                    ui.card(
-                        ui.card_header("Customer Demographics"),
-                        output_widget("plot_customer_demo"),
-                        full_screen=True,
-                        height="200px",
+                    # TOP LEFT: KPIs
+                    ui.layout_columns(
+                        ui.output_ui("value_cost_unit"),
+                        ui.output_ui("value_pass_rate"),
+                        col_widths=[6, 6],
                     ),
+                    # TOP RIGHT: Heatmap
                     ui.card(
-                        ui.card_header("Stock Availability"),
-                        output_widget("plot_availability"),
+                        ui.card_header("Shipping Cost Matrix (Route vs. Mode)"),
+                        output_widget("plot_route_heatmap"),
                         full_screen=True,
-                        height="200px",
                     ),
-                    col_widths=[6, 6],
+                    # BOTTOM LEFT: Defect Rates
+                    ui.card(
+                        ui.card_header("Defect Rates by SKU"),
+                        output_widget("plot_defect_sku"),
+                        full_screen=True,
+                    ),
+                    # BOTTOM RIGHT: Mode Plot and Demographics/Availability
+                    ui.layout_columns(
+                        ui.card(
+                            ui.card_header("Cost vs. Time Tradeoff by Mode"),
+                            output_widget("plot_cost_time_faceted"),
+                            full_screen=True,
+                            height="400px",
+                        ),
+                        ui.layout_columns(
+                            ui.card(
+                                ui.card_header("Customer Demographics"),
+                                output_widget("plot_customer_demo"),
+                                full_screen=True,
+                                height="200px",
+                            ),
+                            ui.card(
+                                ui.card_header("Stock Availability"),
+                                output_widget("plot_availability"),
+                                full_screen=True,
+                                height="200px",
+                            ),
+                            col_widths=[6, 6],
+                        ),
+                        col_widths=[12, 12],
+                    ),
+                    col_widths=[6, 6, 6, 6]
                 ),
-                col_widths=[12, 12],
+                ui.hr(),
+                ui.layout_columns(
+                    ui.markdown(
+                        f"**Supply Chain Dashboard** - Managing costs, demographics, and quality control | "
+                        f"**Authors:** Rocco Lee, Gaurang Ahuja, Junli Liu, Amanpreet Binepal | "
+                        f"[Github](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard) | "
+                        f"**Last Updated:** {date.today()}"
+                    ),
+                ),
             ),
-            col_widths=[6, 6, 6, 6]
         ),
-        ui.hr(),
-        ui.layout_columns(
-            ui.markdown(
-                f"**Supply Chain Dashboard** - Managing costs, demographics, and quality control | "
-                f"**Authors:** Rocco Lee, Gaurang Ahuja, Junli Liu, Amanpreet Binepal | "
-                f"[Github](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard) | "
-                f"**Last Updated:** {date.today()}"
-                ),
-        ),
+        ui.nav_panel("Data",
+            ui.layout_columns(
+                ui.input_switch("filters", "Show filters", True),
+                ui.download_button("download_all", "⬇ All Data", class_="btn-secondary"),
+                ui.download_button("download_view", "⬇ Filtered View", class_="btn-primary"),
+                col_widths=[3, 3, 3],
+            ),
+            ui.output_data_frame("table")
+            ),
     ),
+    
 )
 
 
@@ -179,6 +190,15 @@ def server(input, output, session):
     @render.download(filename="supply_chain_filtered.csv")
     def download_view():
         yield filtered_data().to_csv(index=False)
+
+    @render.data_frame
+    def table():
+        return render.DataTable(
+            filtered_data(),
+            filters=input.filters(),
+            height="400px",
+            width="100%",
+        )
 
     # Heatmap
     @render_altair
