@@ -4,6 +4,10 @@
 
 This interactive dashboard empowers supply chain managers in the fashion and beauty industry to make data-driven decisions through comprehensive visualization and analysis tools. Users can explore shipping costs across transportation modes and routes, compare supplier quality metrics, and optimize inventory management. The platform enables dynamic filtering, comparative analysis, and actionable insights for operational efficiency and cost optimization.
 
+## Demo
+
+![Demo](img/demo.gif)
+
 ## Getting Started
 
 ### Installation
@@ -20,6 +24,11 @@ conda env create -f environment.yml
 conda activate supply-app
 ```
 
+3. Install required packages from requirements.txt:
+```bash
+pip install -r requirements.txt
+```
+
 ### Running the Dashboard Locally
 
 ```bash
@@ -28,6 +37,11 @@ shiny run app.py
 ```
 
 The dashboard will be available at `http://localhost:8000`
+
+### View the Dashboard live
+If you've made changes to the dev branch and have the pull request approved by one of our developers, you can view the changes to the dashboard [here](https://connect.posit.cloud/roccolee18/content/019c9b43-261d-12b0-0e9d-de4aab567c9e)
+
+Once a new release is published, the most recent dev commits will be visible in the stable version of our dashboard, accessible [here](https://connect.posit.cloud/roccolee18/content/019c9b42-3095-b6d6-0bde-f47f0f78a6be)
 
 ## Contributing
 
