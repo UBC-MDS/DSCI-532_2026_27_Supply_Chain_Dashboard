@@ -59,7 +59,7 @@ Before contributing, ensure you have:
 5. **Run the dashboard locally**:
    ```bash
    cd src
-   python app.py
+   shiny run src/app.py
    ```
    The dashboard will be available at `http://localhost:8000`
 
@@ -69,7 +69,7 @@ We follow a collaborative workflow based on Git best practices:
 
 1. **Create an issue** for the feature/bug you're working on (if not already exists)
 2. **Assign yourself** to the issue
-3. **Create a feature branch** from `main`
+3. **Create a feature branch** from `dev`
 4. **Make your changes** following our code style guidelines
 5. **Test your changes** thoroughly
 6. **Submit a pull request** for review
