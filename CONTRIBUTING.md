@@ -58,7 +58,6 @@ Before contributing, ensure you have:
 
 5. **Run the dashboard locally**:
    ```bash
-   cd src
    shiny run src/app.py
    ```
    The dashboard will be available at `http://localhost:8000`
