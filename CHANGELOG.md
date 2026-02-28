@@ -1,78 +1,106 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+All notable changes to the Supply Chain Dashboard project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.2.0]
+---
+
+## [0.2.0] - 2026-02-28
 
 ### Added
+
 - `reports/m2_spec.md` as per App specification requirements. ([#25](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/25))
 - Changelog file ([#31](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/31))
 - `.gitignore` file
 - `requirements.txt` file for Posit Cloud ([#24](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/24))
-- Data page with `DataTable` using tabs ([#36](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/36))
-- Added footer to the Dashboard with GitHub link, Author names, and Last Updated date ([#33](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/33))
+- Footer to the Dashboard with GitHub link, Author names, and Last Updated date  ([#33](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/33))
+- Data page with `DataTable` using tabs for organized data viewing ([#36](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/36))
+- `filters` toggle switch in Data tab to show/hide column filtering UI in the data table
+- Dev branch for staging and preview deployments
+- CI/CD pipeline deploying to Posit Connect Cloud (stable on `main`, preview on `dev`)
 
 ### Changed
-- Update `environment.yml` to include `altair` and changed other versions to ensure consistency. ([#32](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/32))
+
+- Updated `reports/m2_spec.md` to reflect actual implementation:
+  - Added Data tab components (filters toggle, download buttons) to Component Inventory
+  - Enhanced Reactivity Diagram with separate sections for Dashboard and Data tabs
+  - Expanded Calculation Details with detailed transformation logic and auxiliary components
+  - Updated total component count from 12 to 15 components
+  - Added component summary statistics and revision history
+- Moved download buttons to Data page for better organization ([#36](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/36))
+- Repositioned KPIs to top of dashboard for improved visibility ([#29](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/29))
+- Updated `environment.yml` to include Altair and standardized package versions ([#32](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/32))
 - Move app dependencies to `requirements.txt` ([#24](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/24))
 - `README` instructions ([#24](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/24))
-- Changed layout to put KPIs on top ([#29](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/29))
-- Moved download buttons to Data page ([#36](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/36))
-
+- Revised Job Stories #3 and #4 in `m2_spec.md`:
+  - Job Story #3: Shifted focus from "lead times and stock levels" to stock availability visualization
+  - Job Story #4: Changed from "revenue and sales KPIs" to inspection pass rate and manufacturing cost per unit
 
 ### Fixed
-- Fixed plot sizing so rather than having to scroll the plots, we scroll the page ([#29](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/29))
-- Fixed sizing of UI cards ([#29](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/29))
-- Fixed Mode plot issue where plot didn't revert when reselecting all filters
 
-### CI / Infrastructure
-- Created `dev` branch for staging and preview purposes.
-- Deploy stable build (`main`) to Posit Connect Cloud.
-- Deploy preview build (`dev`) to Posit Connect Cloud.
+- Fixed plot sizing issue to allow page scrolling instead of plot-specific scrolling ([#29](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/29))
+- Fixed sizing of UI cards for consistent layout ([#29](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/29))
+- Fixed Mode plot issue where plot didn't revert when reselecting all filters ([#29](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/29))
 
 ### Known Issues
 
+- Font size and formatting could be improved for better readability
+- Reset filter button functionality not yet implemented (planned for future milestone)
+
 ### Reflection
 
-**Implementation Status:**
+**Job Stories Implementation Status:**
+- **Job Story #1** (Cost Analysis): ✅ Fully implemented through transportation mode filters and shipping cost heatmap
+- **Job Story #2** (Supplier Performance): ✅ Fully implemented with supplier dropdown and defect rate scatter plot
+- **Job Story #3** (Inventory Planning): 🔄 Implemented with stock availability visualization (revised from original lead time focus)
+- **Job Story #4** (Business Monitoring): 🔄 Implemented with KPI value boxes for cost per unit and inspection pass rate (revised from revenue/sales metrics)
 
-Job Stories:
+**Layout and Design:**
+- Successfully repositioned KPIs to top of dashboard, recognizing their importance as primary metrics
+- Implemented multi-page layout (Dashboard and Data tabs) not originally sketched in M1, enhancing data exploration capabilities
+- Added 15 components total (exceeding the 8-component minimum for a 4-person team), demonstrating comprehensive implementation
 
-- Job Story 1: implemented via the Cost vs. Time Tradeoff by Mode plot and Shipping Cost Matrix (Route vs. Mode).
-- Job Story 2: implemented via the Defect Rates by SKU scatterplot.
-- Job Story 3: revised via the Stock Availability barchart. Lead times was not included in the Stock Availability barchart.
-- Job Story 4: revised with Avg. Cost per Unit and Inspection Pass Rate KPIs. They are not direct KPIs for revenue and product sales but they are connected to that assumption.
+**Deviations from Original Plan:**
+- Added Data tab with additional components (filters toggle, download buttons) during implementation to enhance user experience
+- Job Stories #3 and #4 were revised to better align with available data and dashboard capabilities
 
-**Deviations:**
+**Strengths:**
+- Hub-and-spoke reactivity architecture efficiently filters data once per user interaction
+- Comprehensive component inventory with clear separation between core and auxiliary components
+- Detailed specification documentation supporting future development in M3/M4
 
-- We changed the layout of the dashboard since our KPIs were on the bottom. It was suggested that KPIs should be on the top left as it is the most important part. We also changed the layout to fit our plots better based on the movement of the KPI cards.
-- Added a multi-page layout to add a separate DataTable that was not in the initial sketch.
+**Areas for Improvement:**
+- Enhanced font formatting and sizing for better visual hierarchy
+- Addition of reset filter button for improved user experience
+- Further refinement of revised job stories in future milestones
 
-**Known Issues:**
-
-- We had an issue with the Altair plot not going back to its original state when reselecting all the filters. It was resolved by giving it a set width instead of setting it to "container".
-
-**Best Practices:**
-
-- Added comparisons vs a baseline for the KPIs like how it was shown in Lecture 4.
-- Used a colorblind friendly palette.
-
-**Self Assessment:**
-
-- Strengths: Our layout for the dashboard was well revised to make it so our most important plots are on the top.
-- Limitations: Our current plots for Job Story 3 and 4 were revised from the original changing how it approaches the job story.
-- Future Improvements: Add a reset filter button, when clicking the download button have a popup to choose location, revise font formatting for KPI cards.
+---
 
 ## [0.0.1] - 2026-02-13
 
 ### Added
-- Initial repo setup ([#1](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/1))
-- Created proposal structure based on example repo ([#6](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/6))
-- Complete sections 1 and 2 of project proposal ([#11](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/11))
-- App skeleton and environment.yml ([#13](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/13))
-- Complete project documentation ([#9](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/9))
-- Complete project proposal sections 3 & 4 ([#16](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/16))
-- Proposal section 5 ([#18](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/18))
+
+- Initial repository setup with standard directory structure ([#1](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/1))
+- Project proposal documentation in `reports/` directory ([#9](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/9))
+- Basic app skeleton in `src/app.py` with placeholder layout ([#13](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/13))
+- Environment configuration files (`environment.yml`) ([#13](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/13))
+- `README.md` with project description and setup instructions
+- `CONTRIBUTING.md` with collaboration guidelines
+- `.gitignore` configured for Python projects
+
+### Notes
+
+This release establishes the foundation for the Supply Chain Dashboard project, completing all Milestone 1 Phase 3 requirements.
+
+---
+
+## Release History
+
+- [0.2.0] - Dashboard prototype with full functionality (Milestone 2)
+- [0.0.1] - Initial project setup and skeleton app (Milestone 1)
+
+---
+
+_For detailed component specifications and architecture, see `reports/m2_spec.md`_

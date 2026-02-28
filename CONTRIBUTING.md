@@ -36,25 +36,29 @@ Before contributing, ensure you have:
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/UBC-MDS/DSCI-532_2026_27_TBD.git
-   cd DSCI-532_2026_27_TBD
+   git clone https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard.git
+   cd DSCI-532_2026_27_Supply_Chain_Dashboard
    ```
 
 2. **Create and activate the conda environment**:
    ```bash
    conda env create -f environment.yml
-   conda activate supply-chain-dashboard
+   conda activate supply-app
    ```
 
 3. **Verify installation**:
    ```bash
-   conda list  # Check installed packages
+   conda list
    ```
 
-4. **Run the dashboard locally**:
+4. **Install package dependancies**
+    ```bash
+    pip install -r requirements.txt # Check installed packages
+    ```
+
+5. **Run the dashboard locally**:
    ```bash
-   cd src
-   python app.py
+   shiny run src/app.py
    ```
    The dashboard will be available at `http://localhost:8000`
 
@@ -64,7 +68,7 @@ We follow a collaborative workflow based on Git best practices:
 
 1. **Create an issue** for the feature/bug you're working on (if not already exists)
 2. **Assign yourself** to the issue
-3. **Create a feature branch** from `main`
+3. **Create a feature branch** from `dev`
 4. **Make your changes** following our code style guidelines
 5. **Test your changes** thoroughly
 6. **Submit a pull request** for review
@@ -372,6 +376,7 @@ This project is maintained by:
 - [@roccolee18](https://github.com/roccolee18)
 - [@amanbinepal](https://github.com/amanbinepal)
 - [@junliliu1](https://github.com/junliliu1)
+- [@gaurang23](https://github.com/gaurang23)
 
 ## Attribution
 
