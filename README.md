@@ -32,8 +32,7 @@ pip install -r requirements.txt
 ### Running the Dashboard Locally
 
 ```bash
-cd src
-shiny run app.py
+shiny src/run app.py
 ```
 
 The dashboard will be available at `http://localhost:8000`
