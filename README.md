@@ -39,9 +39,9 @@ shiny run app.py
 The dashboard will be available at `http://localhost:8000`
 
 ### View the Dashboard live
-If you've made changes to the dev branch and have the pull request approved by one of our developers, you can view the changes to the dashboard [here](https://connect.posit.cloud/roccolee18/content/019c9b43-261d-12b0-0e9d-de4aab567c9e)
+If you've made changes to the dev branch and have the pull request approved by one of our developers, you can view the changes to the dashboard [here](https://019c9b43-261d-12b0-0e9d-de4aab567c9e.share.connect.posit.cloud)
 
-Once a new release is published, the most recent dev commits will be visible in the stable version of our dashboard, accessible [here](https://connect.posit.cloud/roccolee18/content/019c9b42-3095-b6d6-0bde-f47f0f78a6be)
+Once a new release is published, the most recent dev commits will be visible in the stable version of our dashboard, accessible [here](https://019c9b42-3095-b6d6-0bde-f47f0f78a6be.share.connect.posit.cloud)
 
 ## Contributing
 
