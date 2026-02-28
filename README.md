@@ -32,15 +32,15 @@ pip install -r requirements.txt
 ### Running the Dashboard Locally
 
 ```bash
-shiny src/run app.py
+shiny run src/run app.py
 ```
 
 The dashboard will be available at `http://localhost:8000`
 
 ### View the Dashboard live
-If you've made changes to the dev branch and have the pull request approved by one of our developers, you can view the changes to the dashboard [here](https://019c9b43-261d-12b0-0e9d-de4aab567c9e.share.connect.posit.cloud)
+If you've made changes to the `dev` branch and have the pull request approved (and merged) by one of our developers, you can view the changes to the dashboard [here](https://019c9b43-261d-12b0-0e9d-de4aab567c9e.share.connect.posit.cloud)
 
-Once a new release is published, the most recent dev commits will be visible in the stable version of our dashboard, accessible [here](https://019c9b42-3095-b6d6-0bde-f47f0f78a6be.share.connect.posit.cloud)
+Once a new release is published, the most recent commits will be visible in the stable version of our dashboard (`main` branch), accessible [here](https://019c9b42-3095-b6d6-0bde-f47f0f78a6be.share.connect.posit.cloud)
 
 ## Contributing
 
@@ -48,9 +48,8 @@ Interested in contributing? Check out the [CONTRIBUTING.md](CONTRIBUTING.md) fil
 
 ## License
 
-This project is dual-licensed:
+This project is licensed:
 - Software components are licensed under the MIT License - see [LICENSE](LICENSE) file for details
-- Documentation and content are licensed under Creative Commons - see [LICENSE.md](LICENSE.md) file for details
 
 ## Code of Conduct
 
