@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Changelog file ([#31](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/31))
 - `.gitignore` file
 - `requirements.txt` file for Posit Cloud ([#24](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/24))
-- Data page with DataTable using tabs ([#36](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/36))
+- Data page with `DataTable` using tabs ([#36](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/36))
 - Added footer to the Dashboard with GitHub link, Author names, and Last Updated date ([#33](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/33))
 
 ### Changed
@@ -32,6 +32,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Created `dev` branch for staging and preview purposes.
 - Deploy stable build (`main`) to Posit Connect Cloud.
 - Deploy preview build (`dev`) to Posit Connect Cloud.
+
+### Known Issues
 
 ### Reflection
 
