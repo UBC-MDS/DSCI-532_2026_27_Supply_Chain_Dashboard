@@ -9,6 +9,8 @@ from dotenv import load_dotenv
 import os
 import sys
 from pathlib import Path
+import pathlib
+from ai_query_engine import SupplyChainAIEngine
 
 # Add src directory to Python path
 _current_dir = Path(__file__).parent
@@ -18,11 +20,7 @@ if str(_current_dir) not in sys.path:
 # Load environment variables
 load_dotenv()
 
-# Import AI engine
-from ai_query_engine import SupplyChainAIEngine
-
 # Load data globally
-import pathlib
 _app_dir = pathlib.Path(__file__).parent.parent
 df = pd.read_csv(_app_dir / "data" / "raw" / "supply_chain_data.csv")
 
