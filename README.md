@@ -4,6 +4,9 @@
 
 This interactive dashboard empowers supply chain managers in the fashion and beauty industry to make data-driven decisions through comprehensive visualization and analysis tools. Users can explore shipping costs across transportation modes and routes, compare supplier quality metrics, and optimize inventory management. The platform enables dynamic filtering, comparative analysis, and actionable insights for operational efficiency and cost optimization.
 
+The dashboard includes an AI-powered query feature that allows users to ask natural language questions about their supply chain data.
+For example: "Show high defect rate products",  "Find cheapest shipping routes",  "Which supplier has best quality?", "Products with cost > $50"
+
 ## Demo
 
 ![Demo](img/demo.gif)
@@ -29,10 +32,16 @@ conda activate supply-app
 pip install -r requirements.txt
 ```
 
+4. (Optional) Configure AI features:
+```bash
+cp .env.example .env
+# Edit .env and add your Anthropic API key
+```
+
 ### Running the Dashboard Locally
 
 ```bash
-shiny run src/run app.py
+shiny run src/app.py
 ```
 
 The dashboard will be available at `http://localhost:8000`

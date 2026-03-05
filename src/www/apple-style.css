@@ -1,0 +1,602 @@
+/* ============================================
+   Apple-Style UI Framework for Shiny Dashboard
+   Based on Apple's Design Philosophy & HIG
+   ============================================ */
+
+/* ===== 1. GLOBAL RESET & BASE ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    /* Apple Brand Colors */
+    --apple-blue: #0071e3;
+    --apple-blue-hover: #0077ed;
+
+    /* Neutral Palette */
+    --gray-50: #F5F5F7;
+    --gray-100: #F2F2F7;
+    --gray-200: #E5E5EA;
+    --gray-600: #86868b;
+    --gray-900: #1d1d1f;
+
+    /* Glass & Blur */
+    --glass-white: rgba(255, 255, 255, 0.8);
+    --glass-border: rgba(255, 255, 255, 0.6);
+    --backdrop-blur: blur(20px);
+
+    /* Spacing */
+    --gap-sm: 16px;
+    --gap-md: 24px;
+    --gap-lg: 32px;
+
+    /* Border Radius */
+    --radius-sm: 12px;
+    --radius-md: 18px;
+    --radius-lg: 24px;
+    --radius-pill: 9999px;
+
+    /* Shadows */
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.12);
+
+    /* Transitions */
+    --spring: cubic-bezier(0.25, 1, 0.5, 1);
+    --duration: 300ms;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC",
+                 "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: var(--gray-50);
+    color: var(--gray-900);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+}
+
+/* ===== 2. AURORA BACKGROUND ===== */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -2;
+    background: var(--gray-50);
+}
+
+body::after {
+    content: '';
+    position: fixed;
+    top: -50%;
+    left: -25%;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* Aurora Orbs */
+.aurora-orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(100px);
+    opacity: 0.6;
+    z-index: 0;
+    pointer-events: none;
+    animation: aurora-float 20s ease-in-out infinite;
+}
+
+.aurora-orb-1 {
+    top: -20%;
+    left: -10%;
+    width: 60vw;
+    height: 60vw;
+    background: radial-gradient(circle, rgba(162, 210, 255, 0.5) 0%, rgba(162, 210, 255, 0) 70%);
+    animation-duration: 25s;
+}
+
+.aurora-orb-2 {
+    top: 20%;
+    right: -10%;
+    width: 55vw;
+    height: 55vw;
+    background: radial-gradient(circle, rgba(200, 180, 255, 0.4) 0%, rgba(200, 180, 255, 0) 70%);
+    animation-duration: 30s;
+    animation-delay: -5s;
+}
+
+.aurora-orb-3 {
+    bottom: -20%;
+    left: 20%;
+    width: 50vw;
+    height: 50vw;
+    background: radial-gradient(circle, rgba(162, 210, 255, 0.3) 0%, rgba(162, 210, 255, 0) 70%);
+    animation-duration: 35s;
+    animation-delay: -10s;
+}
+
+@keyframes aurora-float {
+    0%, 100% {
+        transform: translate(0, 0) scale(1);
+    }
+    33% {
+        transform: translate(30px, -30px) scale(1.05);
+    }
+    66% {
+        transform: translate(-20px, 20px) scale(0.95);
+    }
+}
+
+/* ===== 3. LAYOUT CONTAINER ===== */
+.bslib-page-fluid {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: var(--gap-lg);
+    position: relative;
+    z-index: 1;
+}
+
+/* ===== 4. GLASSMORPHISM CARDS ===== */
+.card,
+.bslib-card {
+    background: var(--glass-white) !important;
+    backdrop-filter: var(--backdrop-blur);
+    -webkit-backdrop-filter: var(--backdrop-blur);
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius-lg) !important;
+    box-shadow: var(--shadow-md) !important;
+    overflow: hidden;
+    transition: all var(--duration) var(--spring);
+    animation: fade-in-up 0.6s var(--spring) backwards;
+}
+
+.card:hover,
+.bslib-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg) !important;
+}
+
+/* Card Header */
+.card-header,
+.bslib-card-header {
+    background: transparent !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
+    padding: 20px 24px !important;
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.02em;
+    color: var(--gray-900) !important;
+}
+
+/* Card Body */
+.card-body,
+.bslib-card-body {
+    padding: 24px !important;
+}
+
+/* ===== 5. VALUE BOXES (KPI) ===== */
+.bslib-value-box {
+    background: var(--glass-white) !important;
+    backdrop-filter: var(--backdrop-blur);
+    -webkit-backdrop-filter: var(--backdrop-blur);
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius-lg) !important;
+    box-shadow: var(--shadow-md) !important;
+    padding: 28px !important;
+    transition: all var(--duration) var(--spring);
+    animation: fade-in-up 0.6s var(--spring) backwards;
+}
+
+.bslib-value-box:hover {
+    transform: translateY(-3px) scale(1.01);
+    box-shadow: var(--shadow-lg) !important;
+}
+
+.bslib-value-box .value-box-value {
+    font-size: 42px !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.03em !important;
+}
+
+.bslib-value-box .value-box-title {
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    opacity: 0.7;
+}
+
+/* ===== 6. BUTTONS ===== */
+/* Primary Button */
+.btn-primary,
+button.btn-primary,
+a.btn-primary {
+    background: var(--apple-blue) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: var(--radius-pill) !important;
+    padding: 12px 28px !important;
+    font-size: 15px !important;
+    font-weight: 500 !important;
+    letter-spacing: -0.01em;
+    box-shadow: 0 4px 12px rgba(0, 113, 227, 0.2) !important;
+    transition: all var(--duration) var(--spring);
+    cursor: pointer;
+}
+
+.btn-primary:hover,
+button.btn-primary:hover,
+a.btn-primary:hover {
+    background: var(--apple-blue-hover) !important;
+    transform: scale(1.02);
+    box-shadow: 0 6px 16px rgba(0, 113, 227, 0.3) !important;
+}
+
+.btn-primary:active {
+    transform: scale(0.98);
+}
+
+/* Secondary Button */
+.btn-secondary,
+button.btn-secondary,
+a.btn-secondary {
+    background: var(--gray-200) !important;
+    color: var(--gray-900) !important;
+    border: none !important;
+    border-radius: var(--radius-pill) !important;
+    padding: 12px 28px !important;
+    font-size: 15px !important;
+    font-weight: 500 !important;
+    letter-spacing: -0.01em;
+    box-shadow: var(--shadow-sm) !important;
+    transition: all var(--duration) var(--spring);
+    cursor: pointer;
+}
+
+.btn-secondary:hover,
+button.btn-secondary:hover,
+a.btn-secondary:hover {
+    background: #dcdce0 !important;
+    transform: scale(1.02);
+    box-shadow: var(--shadow-md) !important;
+}
+
+/* Success Button */
+.btn-success {
+    background: #34c759 !important;
+    color: white !important;
+    border: none !important;
+    border-radius: var(--radius-pill) !important;
+    padding: 12px 28px !important;
+    font-size: 15px !important;
+    font-weight: 500 !important;
+    box-shadow: 0 4px 12px rgba(52, 199, 89, 0.2) !important;
+    transition: all var(--duration) var(--spring);
+}
+
+.btn-success:hover {
+    background: #30b350 !important;
+    transform: scale(1.02);
+    box-shadow: 0 6px 16px rgba(52, 199, 89, 0.3) !important;
+}
+
+/* Large Buttons */
+.btn-lg {
+    padding: 16px 36px !important;
+    font-size: 17px !important;
+}
+
+/* ===== 7. INPUTS & FORMS ===== */
+.form-control,
+.form-select,
+input[type="text"],
+input[type="number"],
+input[type="email"],
+select {
+    background: var(--gray-100) !important;
+    border: none !important;
+    border-radius: var(--radius-sm) !important;
+    padding: 12px 16px !important;
+    font-size: 15px !important;
+    color: var(--gray-900) !important;
+    transition: all var(--duration) var(--spring);
+}
+
+.form-control:focus,
+.form-select:focus,
+input:focus,
+select:focus {
+    background: white !important;
+    box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.15) !important;
+    outline: none !important;
+}
+
+/* Checkbox & Radio */
+.form-check-input {
+    width: 20px !important;
+    height: 20px !important;
+    border: 2px solid var(--gray-200) !important;
+    border-radius: 6px !important;
+    transition: all var(--duration) var(--spring);
+}
+
+.form-check-input:checked {
+    background-color: var(--apple-blue) !important;
+    border-color: var(--apple-blue) !important;
+}
+
+/* ===== 8. SIDEBAR ===== */
+.bslib-sidebar-layout > .sidebar {
+    background: var(--glass-white) !important;
+    backdrop-filter: var(--backdrop-blur);
+    -webkit-backdrop-filter: var(--backdrop-blur);
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius-lg) !important;
+    box-shadow: var(--shadow-md) !important;
+    padding: 24px !important;
+    animation: fade-in-left 0.6s var(--spring) backwards;
+}
+
+.bslib-sidebar-layout > .sidebar h5 {
+    font-size: 20px !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.02em;
+    margin-bottom: 20px !important;
+    color: var(--gray-900);
+}
+
+/* ===== 9. NAV PILLS =====  */
+.nav-pills .nav-link {
+    background: transparent !important;
+    color: var(--gray-600) !important;
+    border-radius: var(--radius-md) !important;
+    padding: 12px 24px !important;
+    font-size: 16px !important;
+    font-weight: 500 !important;
+    margin-right: 8px !important;
+    transition: all var(--duration) var(--spring);
+}
+
+.nav-pills .nav-link:hover {
+    background: rgba(0, 0, 0, 0.04) !important;
+    color: var(--gray-900) !important;
+}
+
+.nav-pills .nav-link.active {
+    background: var(--apple-blue) !important;
+    color: white !important;
+    box-shadow: 0 4px 12px rgba(0, 113, 227, 0.25) !important;
+}
+
+/* ===== 10. TITLE & TYPOGRAPHY ===== */
+.bslib-page-title,
+h1, h2, h3, h4, h5 {
+    font-weight: 700 !important;
+    letter-spacing: -0.02em !important;
+    color: var(--gray-900) !important;
+}
+
+.bslib-page-title {
+    font-size: 48px !important;
+    margin-bottom: 32px !important;
+    background: linear-gradient(135deg, #1d1d1f 0%, #4a4a4f 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: fade-in-down 0.6s var(--spring) backwards;
+}
+
+h5 {
+    font-size: 18px !important;
+}
+
+/* Small text */
+small, .small {
+    color: var(--gray-600) !important;
+    font-size: 13px !important;
+}
+
+/* ===== 11. DATA TABLE ===== */
+.shiny-data-grid {
+    border-radius: var(--radius-md) !important;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm) !important;
+}
+
+.shiny-data-grid th {
+    background: var(--gray-100) !important;
+    color: var(--gray-900) !important;
+    font-weight: 600 !important;
+    font-size: 13px !important;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 14px 16px !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
+}
+
+.shiny-data-grid td {
+    padding: 12px 16px !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.04) !important;
+}
+
+.shiny-data-grid tr:hover {
+    background: rgba(0, 113, 227, 0.04) !important;
+}
+
+/* ===== 12. CHAT UI ===== */
+.shiny-chat-container {
+    background: transparent !important;
+    border: none !important;
+}
+
+.shiny-chat-message {
+    background: var(--glass-white) !important;
+    backdrop-filter: var(--backdrop-blur);
+    border-radius: var(--radius-md) !important;
+    padding: 16px !important;
+    margin-bottom: 12px !important;
+    box-shadow: var(--shadow-sm) !important;
+    animation: fade-in-up 0.3s var(--spring) backwards;
+}
+
+.shiny-chat-message.user {
+    background: var(--apple-blue) !important;
+    color: white !important;
+    margin-left: 20%;
+}
+
+.shiny-chat-message.assistant {
+    background: var(--glass-white) !important;
+    margin-right: 20%;
+}
+
+/* ===== 13. SPACING & LAYOUT ===== */
+.layout-columns {
+    gap: var(--gap-md) !important;
+}
+
+hr {
+    border: none;
+    height: 1px;
+    background: rgba(0, 0, 0, 0.08);
+    margin: var(--gap-lg) 0;
+}
+
+/* ===== 14. ANIMATIONS ===== */
+@keyframes fade-in-up {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fade-in-down {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fade-in-left {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Stagger animations for cards */
+.card:nth-child(1),
+.bslib-card:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.card:nth-child(2),
+.bslib-card:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+.card:nth-child(3),
+.bslib-card:nth-child(3) {
+    animation-delay: 0.2s;
+}
+
+.card:nth-child(4),
+.bslib-card:nth-child(4) {
+    animation-delay: 0.3s;
+}
+
+/* ===== 15. RESPONSIVE ===== */
+@media (max-width: 768px) {
+    :root {
+        --gap-md: 16px;
+        --gap-lg: 24px;
+    }
+
+    .bslib-page-fluid {
+        padding: var(--gap-md);
+    }
+
+    .bslib-page-title {
+        font-size: 32px !important;
+    }
+
+    .aurora-orb {
+        width: 100vw !important;
+        height: 100vw !important;
+    }
+
+    .shiny-chat-message.user {
+        margin-left: 10%;
+    }
+
+    .shiny-chat-message.assistant {
+        margin-right: 10%;
+    }
+}
+
+/* ===== 16. UTILITY CLASSES ===== */
+.text-gradient {
+    background: linear-gradient(135deg, var(--apple-blue) 0%, #5e5ce6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.glass-panel {
+    background: var(--glass-white);
+    backdrop-filter: var(--backdrop-blur);
+    -webkit-backdrop-filter: var(--backdrop-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+}
+
+/* ===== 17. SCROLLBAR ===== */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+/* ===== 18. LOADING & TRANSITIONS ===== */
+.recalculating {
+    opacity: 0.6 !important;
+    transition: opacity var(--duration) var(--spring);
+}
+
+/* Chart containers */
+.html-widget {
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
