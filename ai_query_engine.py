@@ -21,7 +21,7 @@ class SupplyChainAIEngine:
             api_key: Claude API Key (if not provided, read from environment)
         """
         self.client = Anthropic(
-            api_key=api_key or os.getenv('API_KEY')
+            api_key=api_key or os.getenv('ANTHROPIC_API_KEY')
         )
         self.conversation_history = []
         self.query_count = 0
