@@ -100,7 +100,7 @@ app_ui = ui.page_fluid(
             <div class="aurora-orb aurora-orb-3"></div>
         """)
     ),
-    ui.panel_title("✨ Supply Chain Dashboard"),
+    ui.div(ui.panel_title("✨ Supply Chain Dashboard"), style="margin-top: 15px; margin-bottom: 15px;"),
     ui.navset_pill(
         ui.nav_panel("📊 Dashboard",
             ui.layout_sidebar(
@@ -121,6 +121,16 @@ app_ui = ui.page_fluid(
                         "input_supplier",
                         "Supplier",
                         ["All"] + sorted(df["Supplier name"].unique().tolist()),
+                    ),
+                    ui.hr(),
+                    ui.div(
+                        ui.markdown(
+                            f"**✨ Supply Chain Dashboard** • Managing costs, demographics, and quality control\n\n"
+                            f"👨‍💻 **Team:** Rocco Lee • Gaurang Ahuja • Junli Liu • Amanpreet Binepal\n\n"
+                            f"🔗 [View on GitHub](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard) • "
+                            f"**Last Updated:** {date.today()}"
+                        ),
+                        style="text-align: center; opacity: 0.8; font-size: 14px; margin-top: 250px;"
                     ),
                     open="desktop",
                 ),
@@ -168,18 +178,6 @@ app_ui = ui.page_fluid(
                         col_widths=[12, 12],
                     ),
                     col_widths=[6, 6]
-                ),
-                ui.hr(),
-                ui.layout_columns(
-                    ui.div(
-                        ui.markdown(
-                            f"**✨ Supply Chain Dashboard** • Managing costs, demographics, and quality control\n\n"
-                            f"👨‍💻 **Team:** Rocco Lee • Gaurang Ahuja • Junli Liu • Amanpreet Binepal\n\n"
-                            f"🔗 [View on GitHub](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard) • "
-                            f"**Last Updated:** {date.today()}"
-                        ),
-                        style="text-align: center; opacity: 0.8; font-size: 14px;"
-                    ),
                 ),
             ),
         ),
