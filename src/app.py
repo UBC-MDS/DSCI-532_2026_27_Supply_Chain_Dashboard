@@ -125,50 +125,49 @@ app_ui = ui.page_fluid(
                     open="desktop",
                 ),
                 ui.layout_columns(
-                    # TOP LEFT: KPIs
                     ui.layout_columns(
-                        ui.output_ui("value_cost_unit"),
-                        ui.output_ui("value_pass_rate"),
-                        col_widths=[6, 6],
-                    ),
-                    # TOP RIGHT: Heatmap
-                    ui.card(
-                        ui.card_header("🌡️ Shipping Cost Matrix (Route vs. Mode)"),
-                        output_widget("plot_route_heatmap"),
-                        full_screen=True,
-                    ),
-                    # BOTTOM LEFT: Defect Rates
-                    ui.card(
-                        ui.card_header("🔍 Defect Rates by SKU"),
-                        output_widget("plot_defect_sku"),
-                        full_screen=True,
-                    ),
-                    # BOTTOM RIGHT: Mode Plot and Demographics/Availability
-                    ui.layout_columns(
+                        ui.layout_columns(
+                            ui.output_ui("value_cost_unit"),
+                            ui.output_ui("value_pass_rate"),
+                            col_widths=[6, 6],
+                        ),
                         ui.card(
-                            ui.card_header("⚖️ Cost vs. Time Tradeoff by Mode"),
-                            output_widget("plot_cost_time_faceted"),
+                            ui.card_header("🔍 Defect Rates by SKU"),
+                            output_widget("plot_defect_sku"),
                             full_screen=True,
-                            height="400px",
                         ),
                         ui.layout_columns(
                             ui.card(
                                 ui.card_header("👥 Customer Demographics"),
                                 output_widget("plot_customer_demo"),
                                 full_screen=True,
-                                height="200px",
+                                height="200px"
                             ),
                             ui.card(
                                 ui.card_header("📦 Stock Availability"),
                                 output_widget("plot_availability"),
                                 full_screen=True,
-                                height="200px",
+                                height="200px"
                             ),
                             col_widths=[6, 6],
                         ),
+                        col_widths=[12, 12, 12]
+                    ),
+
+                    ui.layout_columns(
+                        ui.card(
+                            ui.card_header("🌡️ Shipping Cost Matrix (Route vs. Mode)"),
+                            output_widget("plot_route_heatmap"),
+                            full_screen=True,
+                        ),
+                        ui.card(
+                            ui.card_header("⚖️ Cost vs. Time Tradeoff by Mode"),
+                            output_widget("plot_cost_time_faceted"),
+                            full_screen=True,
+                        ),
                         col_widths=[12, 12],
                     ),
-                    col_widths=[6, 6, 6, 6]
+                    col_widths=[6, 6]
                 ),
                 ui.hr(),
                 ui.layout_columns(
@@ -364,7 +363,7 @@ def server(input, output, session):
                     alt.Tooltip("Value:Q", format=".2f", title="Avg Value"),
                 ],
             )
-            .properties(width=500, height=120)
+            .properties(width=850, height=170)
             .resolve_scale(y="independent")
         )
 
@@ -410,7 +409,6 @@ def server(input, output, session):
             showcase=kpi_showcase(cmp),
             showcase_layout="left center",
             theme=cmp["theme"],
-            min_height="500px",
         )
 
     @render.ui
@@ -422,7 +420,6 @@ def server(input, output, session):
             showcase=kpi_showcase(cmp),
             showcase_layout="left center",
             theme=cmp["theme"],
-            min_height="500px",
         )
 
     # Defect Rate Scatter plot
@@ -443,7 +440,7 @@ def server(input, output, session):
                     alt.Tooltip("Defect rates:Q", format=".2f"),
                 ],
             )
-            .properties(width="container", height=500)
+            .properties(width="container", height=400)
         )
 
     # ==================== AI Explorer ====================
