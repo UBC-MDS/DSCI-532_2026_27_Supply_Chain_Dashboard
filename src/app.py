@@ -1,12 +1,28 @@
 from shiny import App, ui, render, reactive
+from shiny.ui import Chat, chat_ui
 from shinywidgets import output_widget, render_altair
 import pandas as pd
 import altair as alt
 from datetime import date
 from faicons import icon_svg
+from dotenv import load_dotenv
+import os
+import sys
+from pathlib import Path
+import pathlib
+from ai_query_engine import SupplyChainAIEngine
+
+# Add src directory to Python path
+_current_dir = Path(__file__).parent
+if str(_current_dir) not in sys.path:
+    sys.path.insert(0, str(_current_dir))
+
+# Load environment variables
+load_dotenv()
 
 # Load data globally
-df = pd.read_csv("data/raw/supply_chain_data.csv")
+_app_dir = pathlib.Path(__file__).parent.parent
+df = pd.read_csv(_app_dir / "data" / "raw" / "supply_chain_data.csv")
 
 # Colorblind-friendly palette (Okabe-Ito)
 # Blue, Orange, Green, Pink, Yellow, Light Blue, Light Orange
@@ -74,12 +90,22 @@ def kpi_caption(cmp):
     )
 
 app_ui = ui.page_fluid(
-    ui.panel_title("Supply Chain Dashboard"),
+    # Custom CSS stylesheet
+    ui.head_content(
+        ui.tags.link(rel="stylesheet", href="apple-style.css"),
+        # Aurora background orbs
+        ui.HTML("""
+            <div class="aurora-orb aurora-orb-1"></div>
+            <div class="aurora-orb aurora-orb-2"></div>
+            <div class="aurora-orb aurora-orb-3"></div>
+        """)
+    ),
+    ui.div(ui.panel_title("✨ Supply Chain Dashboard"), style="margin-top: 15px; margin-bottom: 15px;"),
     ui.navset_pill(
-        ui.nav_panel("Dashboard",
+        ui.nav_panel("📊 Dashboard",
             ui.layout_sidebar(
                 ui.sidebar(
-                    ui.h5("Global Filters"),
+                    ui.h5("🎛️ Global Filters"),
                     ui.input_select(
                         "input_product_type",
                         "Product Category",
@@ -96,66 +122,66 @@ app_ui = ui.page_fluid(
                         "Supplier",
                         ["All"] + sorted(df["Supplier name"].unique().tolist()),
                     ),
+                    ui.hr(),
+                    ui.div(
+                        ui.markdown(
+                            f"**✨ Supply Chain Dashboard** • Managing costs, demographics, and quality control\n\n"
+                            f"👨‍💻 **Team:** Rocco Lee • Gaurang Ahuja • Junli Liu • Amanpreet Binepal\n\n"
+                            f"🔗 [View on GitHub](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard) • "
+                            f"**Last Updated:** {date.today()}"
+                        ),
+                        style="text-align: center; opacity: 0.8; font-size: 14px; margin-top: 250px;"
+                    ),
                     open="desktop",
                 ),
                 ui.layout_columns(
-                    # TOP LEFT: KPIs
                     ui.layout_columns(
-                        ui.output_ui("value_cost_unit"),
-                        ui.output_ui("value_pass_rate"),
-                        col_widths=[6, 6],
-                    ),
-                    # TOP RIGHT: Heatmap
-                    ui.card(
-                        ui.card_header("Shipping Cost Matrix (Route vs. Mode)"),
-                        output_widget("plot_route_heatmap"),
-                        full_screen=True,
-                    ),
-                    # BOTTOM LEFT: Defect Rates
-                    ui.card(
-                        ui.card_header("Defect Rates by SKU"),
-                        output_widget("plot_defect_sku"),
-                        full_screen=True,
-                    ),
-                    # BOTTOM RIGHT: Mode Plot and Demographics/Availability
-                    ui.layout_columns(
+                        ui.layout_columns(
+                            ui.output_ui("value_cost_unit"),
+                            ui.output_ui("value_pass_rate"),
+                            col_widths=[6, 6],
+                        ),
                         ui.card(
-                            ui.card_header("Cost vs. Time Tradeoff by Mode"),
-                            output_widget("plot_cost_time_faceted"),
+                            ui.card_header("🔍 Defect Rates by SKU"),
+                            output_widget("plot_defect_sku"),
                             full_screen=True,
-                            height="400px",
                         ),
                         ui.layout_columns(
                             ui.card(
-                                ui.card_header("Customer Demographics"),
+                                ui.card_header("👥 Customer Demographics"),
                                 output_widget("plot_customer_demo"),
                                 full_screen=True,
-                                height="200px",
+                                height="200px"
                             ),
                             ui.card(
-                                ui.card_header("Stock Availability"),
+                                ui.card_header("📦 Stock Availability"),
                                 output_widget("plot_availability"),
                                 full_screen=True,
-                                height="200px",
+                                height="200px"
                             ),
                             col_widths=[6, 6],
                         ),
+                        col_widths=[12, 12, 12]
+                    ),
+
+                    ui.layout_columns(
+                        ui.card(
+                            ui.card_header("🌡️ Shipping Cost Matrix (Route vs. Mode)"),
+                            output_widget("plot_route_heatmap"),
+                            full_screen=True,
+                        ),
+                        ui.card(
+                            ui.card_header("⚖️ Cost vs. Time Tradeoff by Mode"),
+                            output_widget("plot_cost_time_faceted"),
+                            full_screen=True,
+                        ),
                         col_widths=[12, 12],
                     ),
-                    col_widths=[6, 6, 6, 6]
-                ),
-                ui.hr(),
-                ui.layout_columns(
-                    ui.markdown(
-                        f"**Supply Chain Dashboard** - Managing costs, demographics, and quality control | "
-                        f"**Authors:** Rocco Lee, Gaurang Ahuja, Junli Liu, Amanpreet Binepal | "
-                        f"[Github](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard) | "
-                        f"**Last Updated:** {date.today()}"
-                    ),
+                    col_widths=[6, 6]
                 ),
             ),
         ),
-        ui.nav_panel("Data",
+        ui.nav_panel("📋 Data",
             ui.layout_columns(
                 ui.input_switch("filters", "Show filters", True),
                 ui.download_button("download_all", "⬇ All Data", class_="btn-secondary"),
@@ -163,13 +189,85 @@ app_ui = ui.page_fluid(
                 col_widths=[3, 3, 3],
             ),
             ui.output_data_frame("table")
-            ),
+        ),
+        ui.nav_panel("🤖 AI Explorer",
+            ui.layout_sidebar(
+                ui.sidebar(
+                    ui.h5("💬 AI Assistant"),
+                    ui.markdown(
+                        "**✨ Ask questions in natural language!**\n\n"
+                        "💡 Try these examples:\n\n"
+                        "• Show high defect rate products\n"
+                        "• Find cheapest shipping routes\n"
+                        "• Which supplier has best quality?\n"
+                        "• Products with cost > $50"
+                    ),
+                    ui.hr(),
+                    ui.markdown("**📊 Session Statistics**"),
+                    ui.output_text_verbatim("query_stats"),
+                    open="desktop",
+                    width=350
+                ),
+                ui.layout_columns(
+                    ui.card(
+                        ui.card_header("💬 AI Assistant"),
+                        chat_ui(id="ai_chat"),
+                        full_screen=True,
+                        height="550px",
+                    ),
+                    ui.card(
+                        ui.card_header("📋 Filtered Results"),
+                        ui.output_data_frame("ai_filtered_table"),
+                        full_screen=True,
+                    ),
+                    ui.card(
+                        ui.card_header("📊 Defect Rate by Supplier"),
+                        output_widget("ai_plot_defects"),
+                        full_screen=True,
+                    ),
+                    ui.card(
+                        ui.card_header("💰 Shipping Cost Distribution"),
+                        output_widget("ai_plot_costs"),
+                        full_screen=True,
+                    ),
+                    col_widths=[12, 12, 6, 6]
+                ),
+                ui.layout_columns(
+                    ui.download_button(
+                        "download_ai_filtered",
+                        "⬇ Download Filtered Data (CSV)",
+                        class_="btn-success btn-lg",
+                        width="100%"
+                    ),
+                    col_widths=[12]
+                ),
+            )
+        ),
     ),
-    
+
 )
 
 
 def server(input, output, session):
+
+    # Initialize AI engine
+    ai_engine = SupplyChainAIEngine()
+
+    # Store for AI-filtered data
+    ai_filtered_data_store = reactive.Value(df.copy())
+
+    # Initialize Chat instance
+    chat = Chat(id="ai_chat")
+
+    # Add welcome message
+    @reactive.effect
+    def _():
+        chat.append_message(
+            "👋 Hi! I can help you filter and analyze the supply chain data. Try asking:\n\n"
+            "- 'Show products with defect rate > 3%'\n"
+            "- 'Find cheapest shipping routes'\n"
+            "- 'Which supplier has the best quality?'"
+        )
 
     @reactive.calc
     def filtered_data():
@@ -263,7 +361,7 @@ def server(input, output, session):
                     alt.Tooltip("Value:Q", format=".2f", title="Avg Value"),
                 ],
             )
-            .properties(width=500, height=120)
+            .properties(width=850, height=170)
             .resolve_scale(y="independent")
         )
 
@@ -309,7 +407,6 @@ def server(input, output, session):
             showcase=kpi_showcase(cmp),
             showcase_layout="left center",
             theme=cmp["theme"],
-            min_height="500px",
         )
 
     @render.ui
@@ -321,7 +418,6 @@ def server(input, output, session):
             showcase=kpi_showcase(cmp),
             showcase_layout="left center",
             theme=cmp["theme"],
-            min_height="500px",
         )
 
     # Defect Rate Scatter plot
@@ -342,8 +438,109 @@ def server(input, output, session):
                     alt.Tooltip("Defect rates:Q", format=".2f"),
                 ],
             )
-            .properties(width="container", height=500)
+            .properties(width="container", height=400)
         )
+
+    # ==================== AI Explorer ====================
+
+    @chat.on_user_submit
+    async def handle_chat_input():
+        """Handle user chat input"""
+        # Get user messages
+        user_messages = chat.messages()
+        if not user_messages:
+            return
+
+        # Get last user message
+        user_query = user_messages[-1]["content"]
+
+        # Call AI engine
+        result = ai_engine.natural_language_to_filter(user_query, df)
+
+        if result['success'] and result['filter_code']:
+            # Apply filter
+            filtered = ai_engine.apply_filter(df, result['filter_code'])
+            ai_filtered_data_store.set(filtered)
+
+            # AI response
+            ai_response = f"✅ **{result['explanation']}**\n\n" \
+                         f"📊 Found **{len(filtered)}** matching records (out of {len(df)} total)\n\n" \
+                         f"Data table and charts have been updated - check the results below!"
+        else:
+            ai_response = f"❌ {result['error']}" if result['error'] else \
+                         "Unable to process this query. Please try:\n" \
+                         "- Use simpler language\n" \
+                         "- Specify conditions explicitly (e.g., '>3' instead of 'very high')"
+
+        # Append AI response
+        await chat.append_message(ai_response)
+
+    @render.data_frame
+    def ai_filtered_table():
+        """Display AI-filtered data"""
+        return render.DataTable(
+            ai_filtered_data_store.get(),
+            height="450px",
+            width="100%"
+        )
+
+    @render_altair
+    def ai_plot_defects():
+        """Chart 1: Average defect rate by supplier"""
+        data = ai_filtered_data_store.get()
+
+        if data.empty:
+            return alt.Chart(pd.DataFrame({'message': ['No data']})).mark_text(
+                text='No data', size=20, color='gray'
+            ).properties(width='container', height=300)
+
+        return (
+            alt.Chart(data)
+            .mark_bar()
+            .encode(
+                x=alt.X('Supplier name:N', title='Supplier', axis=alt.Axis(labelAngle=-45)),
+                y=alt.Y('mean(Defect rates):Q', title='Avg Defect Rate (%)'),
+                color=alt.Color('Supplier name:N', scale=alt.Scale(range=CP), legend=None),
+                tooltip=[
+                    alt.Tooltip('Supplier name:N', title='Supplier'),
+                    alt.Tooltip('mean(Defect rates):Q', format='.2f', title='Avg Defect Rate'),
+                    alt.Tooltip('count():Q', title='Records')
+                ]
+            )
+            .properties(width='container', height=300)
+        )
+
+    @render_altair
+    def ai_plot_costs():
+        """Chart 2: Shipping cost distribution"""
+        data = ai_filtered_data_store.get()
+
+        if data.empty:
+            return alt.Chart(pd.DataFrame({'message': ['No data']})).mark_text(
+                text='No data', size=20, color='gray'
+            ).properties(width='container', height=300)
+
+        return (
+            alt.Chart(data)
+            .mark_boxplot()
+            .encode(
+                x=alt.X('Transportation modes:N', title='Transport Mode', axis=alt.Axis(labelAngle=-45)),
+                y=alt.Y('Shipping costs:Q', title='Shipping Cost ($)'),
+                color=alt.Color('Transportation modes:N', scale=alt.Scale(range=CP), legend=None)
+            )
+            .properties(width='container', height=300)
+        )
+
+    @render.download(filename="ai_filtered_supply_chain.csv")
+    def download_ai_filtered():
+        """Download AI-filtered data"""
+        yield ai_filtered_data_store.get().to_csv(index=False)
+
+    @render.text
+    def query_stats():
+        """Display query statistics"""
+        return f"Queries used: {ai_engine.query_count}/{ai_engine.max_queries_per_session}\n" \
+               f"Records shown: {len(ai_filtered_data_store.get())}"
 
 
 app = App(app_ui, server)

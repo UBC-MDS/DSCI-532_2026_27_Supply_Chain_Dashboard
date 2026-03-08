@@ -1,4 +1,4 @@
-name: supply-app-test
+name: supply-app
 channels:
   - conda-forge
   - defaults
