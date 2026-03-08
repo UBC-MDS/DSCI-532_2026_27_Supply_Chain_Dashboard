@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.3.0] - 2026-02-08
+
+### Fixed
+
+- Made KPI boxes smaller so it does not take as much space ([#51](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/51))
+- Changed layout; moved `Customer Demographic` and `Stock Availability` plots to the left side below the `Defect Rates by SKU` scatterplot ([#51](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/51))
+- Moved footer to the sidebar to make it so the dashboard page does not scroll anymore ([#51](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/51))
+- Added padding to title of dashboard to fix spacing ([#54](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/54))
+
 ## [0.2.0] - 2026-02-28
 
 ### Added
