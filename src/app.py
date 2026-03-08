@@ -233,13 +233,19 @@ app_ui = ui.page_fluid(
                     col_widths=[12, 12, 6, 6]
                 ),
                 ui.layout_columns(
+                    ui.input_action_button(
+                        "reset_ai_filter",
+                        "🔄 Reset AI Filter",
+                        class_="btn-secondary btn-lg",
+                        width="100%"
+                    ),
                     ui.download_button(
                         "download_ai_filtered",
                         "⬇ Download Filtered Data (CSV)",
                         class_="btn-success btn-lg",
                         width="100%"
                     ),
-                    col_widths=[12]
+                    col_widths=[6, 6]
                 ),
             )
         ),
@@ -280,6 +286,20 @@ def server(input, output, session):
             df_copy["Transportation modes"].isin(input.input_transport_mode())
         ]
         return df_copy
+
+    """Resets filters and tells the AI that filters have been reset"""
+    @reactive.effect
+    @reactive.event(input.reset_ai_filter)
+    async def reset_ai_filter():
+        """This resets the filters data back to full dataset"""
+        ai_filtered_data_store.set(df.copy())
+
+        """This removes the stats of current session and remove line if you don't wanna have reset stats in current session"""
+        ai_engine.reset_session()
+
+        await chat.append_message(
+            "🔄 AI filter has been reset. Showing all records again."
+        )
     
     @render.download(filename="supply_chain_all.csv")
     def download_all():
