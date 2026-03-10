@@ -1,6 +1,6 @@
 from shiny import App, ui, render, reactive
 from shiny.ui import Chat, chat_ui
-from shinywidgets import output_widget, render_altair
+from shinywidgets import output_widget, render_altair, reactive_read
 import pandas as pd
 import altair as alt
 from datetime import date
@@ -423,8 +423,9 @@ def server(input, output, session):
     # Defect Rate Scatter plot
     @render_altair
     def plot_defect_sku():
+        selection = alt.selection_point(name="point", fields=["Supplier name"], on="click")
         return (
-            alt.Chart(filtered_data())
+            alt.Chart(df)
             .mark_circle(size=80)
             .encode(
                 x=alt.X("SKU:N", axis=alt.Axis(labels=False), title="SKUs"),
@@ -432,14 +433,24 @@ def server(input, output, session):
                 color=alt.Color(
                     "Supplier name:N", scale=alt.Scale(range=CP), title="Supplier"
                 ),
+                opacity = alt.condition(selection, alt.value(1.0), alt.value(0.10)),
                 tooltip=[
                     "SKU",
                     "Supplier name",
                     alt.Tooltip("Defect rates:Q", format=".2f"),
                 ],
             )
+            .add_params(selection)
             .properties(width="container", height=400)
         )
+    
+    @reactive.effect
+    def update_supplier():
+        pt = reactive_read(plot_defect_sku.widget.selections, "point")
+        if pt and pt.value:
+            ui.update_select("input_supplier", selected=pt.value[0]["Supplier name"])
+        else:
+            ui.update_select("input_supplier", selected="All")
 
     # ==================== AI Explorer ====================
 
