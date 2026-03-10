@@ -11,7 +11,7 @@ The following job stories guide our dashboard design and implementation:
 | #   | Job Story                                                                                                                                  | Status         | Notes                                                                                    |
 | --- | ------------------------------------------------------------------------------------------------------------------------------------------ | -------------- | ---------------------------------------------------------------------------------------- |
 | 1   | When reviewing quarterly cost reports, I want to filter shipments by transportation mode and route so I can identify cost-effective methods | ✅ Implemented | Core filtering functionality implemented with checkbox group and visualization           |
-| 2   | When evaluating supplier performance, I want to compare defect rates across suppliers and locations so I can make sourcing decisions      | ✅ Implemented | Supplier dropdown and defect rate scatter plot implemented                               |
+| 2   | When evaluating supplier performance, I want to compare defect rates across suppliers and locations so I can make sourcing decisions      | ✅ Implemented | Supplier dropdown and defect rate scatter plot implemented with filtering when clicking on a point on the plot                              |
 | 3   | When planning inventory levels, I want to visualize the relationship between lead times and stock levels so I can optimize buffer stock   | 🔄 Revised     | Refocused on stock availability visualization instead of lead time relationships         |
 | 4   | When monitoring overall business performance, I want to see high-level KPI metrics so I can track operational health                      | 🔄 Revised     | Changed from revenue/sales KPIs to inspection pass rate and manufacturing cost per unit  |
 
@@ -31,7 +31,7 @@ The dashboard contains **15 components** organized into two tabs (Dashboard and 
 | `filtered_data`         | Reactive calc | `@reactive.calc`                 | `input_transport_mode`, `input_product_type`, `input_supplier` | #1, #2, #3, #4 |
 | `plot_route_heatmap`    | Output        | `@render_altair` (Altair)        | `filtered_data`                                              | #1         |
 | `plot_cost_time_faceted`| Output        | `@render_altair` (Altair)        | `filtered_data`                                              | #1         |
-| `plot_defect_sku`       | Output        | `@render_altair` (Altair)        | `filtered_data`                                              | #2         |
+| `plot_defect_sku`       | Output        | `@render_altair` (Altair)        | `df`                                                         | #2         |
 | `plot_customer_demo`    | Output        | `@render_altair` (Altair)        | `filtered_data`                                              | #4         |
 | `plot_availability`     | Output        | `@render_altair` (Altair)        | `filtered_data`                                              | #3         |
 | `value_cost_unit`       | Output        | `ui.value_box()` with `@render.ui` | `filtered_data`                                            | #4         |
@@ -72,10 +72,11 @@ flowchart TD
     A[/input_transport_mode/] --> F{{filtered_data}}
     B[/input_product_type/] --> F
     C[/input_supplier/] --> F
+    DF[(df)] --> P3([plot_defect_sku])
+    P3 --> |click| C
 
     F --> P1([plot_route_heatmap])
     F --> P2([plot_cost_time_faceted])
-    F --> P3([plot_defect_sku])
     F --> P4([plot_customer_demo])
     F --> P5([plot_availability])
     F --> V1([value_cost_unit])
@@ -98,13 +99,13 @@ flowchart TD
 **Architecture rationale:**
 
 This design follows best practices from Lecture 3 by:
-1. **Filtering once per interaction:** The `filtered_data` reactive calc depends on 3 inputs and feeds 8 outputs, ensuring data is filtered once per user interaction, not 8 separate times for each output
+1. **Filtering once per interaction:** The `filtered_data` reactive calc depends on 3 inputs and feeds 7 outputs, ensuring data is filtered once per user interaction, not 7 separate times for each output
 2. **Clear dependency graph:** All outputs depend on either `filtered_data` or independent controls, preventing circular dependencies
 3. **Efficient reactivity:** Changes to any filter trigger exactly one data filtering operation, which then propagates to all dependent visualizations
 
 **Reactivity requirements validation:**
 - ✅ At least one `@reactive.calc` depending on 2+ inputs: `filtered_data` depends on 3 inputs
-- ✅ At least two outputs consuming the same reactive calc: 8 outputs consume `filtered_data`
+- ✅ At least two outputs consuming the same reactive calc: 7 outputs consume `filtered_data`
 - ✅ All outputs respond to user interaction: Every output depends on at least one reactive input or calc
 
 ---
@@ -126,13 +127,15 @@ This design follows best practices from Lecture 3 by:
 5. Returns the filtered pandas DataFrame
 
 **Output consumers:**
-All 8 core outputs consume `filtered_data`:
-- **Visualizations:** `plot_route_heatmap`, `plot_cost_time_faceted`, `plot_defect_sku`, `plot_customer_demo`, `plot_availability`
+7 core outputs consume `filtered_data`:
+- **Visualizations:** `plot_route_heatmap`, `plot_cost_time_faceted`, `plot_customer_demo`, `plot_availability`
 - **KPI metrics:** `value_cost_unit`, `value_pass_rate`
 - **Data table:** `table`
 
+`plot_defect_sku` is consuming `df` and updates `input_supplier` on click
+
 **Performance consideration:**
-By implementing filtering in a single reactive calculation rather than duplicating the logic across 8 separate outputs, the dashboard ensures optimal performance. When a user changes any filter, the data is processed once and the result is efficiently distributed to all dependent components.
+By implementing filtering in a single reactive calculation rather than duplicating the logic across 7 separate outputs, the dashboard ensures optimal performance. When a user changes any filter, the data is processed once and the result is efficiently distributed to all dependent components.
 
 ### Auxiliary Components
 
@@ -158,6 +161,7 @@ By implementing filtering in a single reactive calculation rather than duplicati
 
 **v1.0 (2026-02-XX):** Initial specification with 12 core components
 **v1.1 (2026-02-XX):** Updated to reflect actual implementation including Data tab components (15 total components)
+**v1.2 (2026-02-XX):** Updated to reflect click event interactions in the `plot_defect_sku` scatterplot
 
 ---
 
