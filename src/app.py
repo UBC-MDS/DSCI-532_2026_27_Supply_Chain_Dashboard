@@ -11,6 +11,7 @@ import sys
 from pathlib import Path
 import pathlib
 from ai_query_engine import SupplyChainAIEngine
+from compare import compare
 
 # Add src directory to Python path
 _current_dir = Path(__file__).parent
@@ -32,47 +33,6 @@ BASELINE = {
     "pass_rate": (df["Inspection results"] == "Pass").mean() * 100,
 }
 
-def compare(current, baseline, higher_is_better=True):
-    """
-    Classify current vs baseline — five states:
-      significantly above / slightly above / stable / slightly below / significantly below
-    Thresholds:  change < 1%: stable, 1–5%: slight, > 5%: significant
-    """
-    # guard: can't compute a meaningful delta
-    if baseline == 0 or pd.isna(current):
-        return dict(icon="circle-minus", theme="secondary", badge="no data", label="no data")
-
-    # percentage change relative to baseline; sign tells direction
-    pct = (current - baseline) / abs(baseline) * 100
-
-    # "good" depends on context: higher MPG is good, lower HP is good for efficiency
-    is_good = (pct > 0) if higher_is_better else (pct < 0)
-    abs_pct = abs(pct)
-
-    # badge string shown below the value: e.g. "+5.6 (+24.3%) vs overall avg"
-    sign = "+" if pct >= 0 else ""
-    badge = f"{sign}{current - baseline:.1f} ({sign}{pct:.1f}%) vs overall avg"
-
-    # under 1% change — treat as noise, no colour signal
-    if abs_pct < 1:
-        return dict(icon="arrow-right", theme="secondary", badge="≈ stable vs overall avg", label="stable")
-
-    # direction: matching FA icon
-    icon = "arrow-trend-up" if pct > 0 else "arrow-trend-down"
-
-    # colour: good changes are green (success ≥5%, teal <5%),
-    #         bad changes are red (danger ≥5%, warning <5%)
-    theme = (
-        "success" if (is_good and abs_pct >= 5) else
-        "teal"    if is_good                    else
-        "danger"  if abs_pct >= 5               else
-        "warning"
-    )
-
-    quantifier = "significantly" if abs_pct >= 5 else "slightly"
-    return dict(icon=icon, theme=theme, badge=badge,
-                label=f"{quantifier} {'above' if pct > 0 else 'below'} avg")
-
 
 def kpi_showcase(cmp):
     """FA icon sized for the value-box showcase panel — inherits theme colour."""
@@ -80,29 +40,39 @@ def kpi_showcase(cmp):
     # fill_opacity softens it slightly so it doesn't overpower the value
     return icon_svg(cmp["icon"], height="1.5em", fill_opacity="0.85")
 
+
 def kpi_caption(cmp):
     """Delta badge + five-state label rendered below the value."""
     return ui.tags.div(
         # bold first line: absolute + relative delta, e.g. "+5.6 (+24.3%) vs overall avg"
         ui.HTML(f'<strong style="opacity:0.9">{cmp["badge"]}</strong>'),
         # dimmer second line: human-readable state, e.g. "significantly above avg"
-        ui.div(cmp.get("label", ""), style="opacity:0.7;font-size:0.8rem;margin-top:2px"),
+        ui.div(
+            cmp.get("label", ""), style="opacity:0.7;font-size:0.8rem;margin-top:2px"
+        ),
     )
+
 
 app_ui = ui.page_fluid(
     # Custom CSS stylesheet
     ui.head_content(
         ui.tags.link(rel="stylesheet", href="apple-style.css"),
         # Aurora background orbs
-        ui.HTML("""
+        ui.HTML(
+            """
             <div class="aurora-orb aurora-orb-1"></div>
             <div class="aurora-orb aurora-orb-2"></div>
             <div class="aurora-orb aurora-orb-3"></div>
-        """)
+        """
+        ),
     ),
-    ui.div(ui.panel_title("✨ Supply Chain Dashboard"), style="margin-top: 15px; margin-bottom: 15px;"),
+    ui.div(
+        ui.panel_title("✨ Supply Chain Dashboard"),
+        style="margin-top: 15px; margin-bottom: 15px;",
+    ),
     ui.navset_pill(
-        ui.nav_panel("📊 Dashboard",
+        ui.nav_panel(
+            "📊 Dashboard",
             ui.layout_sidebar(
                 ui.sidebar(
                     ui.h5("🎛️ Global Filters"),
@@ -130,7 +100,7 @@ app_ui = ui.page_fluid(
                             f"🔗 [View on GitHub](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard) • "
                             f"**Last Updated:** {date.today()}"
                         ),
-                        style="text-align: center; opacity: 0.8; font-size: 14px; margin-top: 250px;"
+                        style="text-align: center; opacity: 0.8; font-size: 14px; margin-top: 250px;",
                     ),
                     open="desktop",
                 ),
@@ -151,19 +121,18 @@ app_ui = ui.page_fluid(
                                 ui.card_header("👥 Customer Demographics"),
                                 output_widget("plot_customer_demo"),
                                 full_screen=True,
-                                height="200px"
+                                height="200px",
                             ),
                             ui.card(
                                 ui.card_header("📦 Stock Availability"),
                                 output_widget("plot_availability"),
                                 full_screen=True,
-                                height="200px"
+                                height="200px",
                             ),
                             col_widths=[6, 6],
                         ),
-                        col_widths=[12, 12, 12]
+                        col_widths=[12, 12, 12],
                     ),
-
                     ui.layout_columns(
                         ui.card(
                             ui.card_header("🌡️ Shipping Cost Matrix (Route vs. Mode)"),
@@ -177,20 +146,26 @@ app_ui = ui.page_fluid(
                         ),
                         col_widths=[12, 12],
                     ),
-                    col_widths=[6, 6]
+                    col_widths=[6, 6],
                 ),
             ),
         ),
-        ui.nav_panel("📋 Data",
+        ui.nav_panel(
+            "📋 Data",
             ui.layout_columns(
                 ui.input_switch("filters", "Show filters", True),
-                ui.download_button("download_all", "⬇ All Data", class_="btn-secondary"),
-                ui.download_button("download_view", "⬇ Filtered View", class_="btn-primary"),
+                ui.download_button(
+                    "download_all", "⬇ All Data", class_="btn-secondary"
+                ),
+                ui.download_button(
+                    "download_view", "⬇ Filtered View", class_="btn-primary"
+                ),
                 col_widths=[3, 3, 3],
             ),
-            ui.output_data_frame("table")
+            ui.output_data_frame("table"),
         ),
-        ui.nav_panel("🤖 AI Explorer",
+        ui.nav_panel(
+            "🤖 AI Explorer",
             ui.layout_sidebar(
                 ui.sidebar(
                     ui.h5("💬 AI Assistant"),
@@ -206,7 +181,7 @@ app_ui = ui.page_fluid(
                     ui.markdown("**📊 Session Statistics**"),
                     ui.output_text_verbatim("query_stats"),
                     open="desktop",
-                    width=350
+                    width=350,
                 ),
                 ui.layout_columns(
                     ui.card(
@@ -230,21 +205,20 @@ app_ui = ui.page_fluid(
                         output_widget("ai_plot_costs"),
                         full_screen=True,
                     ),
-                    col_widths=[12, 12, 6, 6]
+                    col_widths=[12, 12, 6, 6],
                 ),
                 ui.layout_columns(
                     ui.download_button(
                         "download_ai_filtered",
                         "⬇ Download Filtered Data (CSV)",
                         class_="btn-success btn-lg",
-                        width="100%"
+                        width="100%",
                     ),
-                    col_widths=[12]
+                    col_widths=[12],
                 ),
-            )
+            ),
         ),
     ),
-
 )
 
 
@@ -280,7 +254,7 @@ def server(input, output, session):
             df_copy["Transportation modes"].isin(input.input_transport_mode())
         ]
         return df_copy
-    
+
     @render.download(filename="supply_chain_all.csv")
     def download_all():
         yield df.to_csv(index=False)
@@ -403,7 +377,9 @@ def server(input, output, session):
         val = filtered_data()["Manufacturing costs"].mean()
         cmp = compare(val, BASELINE["cost"], higher_is_better=False)
         return ui.value_box(
-            "Avg. Cost per Unit", f"${val:.2f}", kpi_caption(cmp),
+            "Avg. Cost per Unit",
+            f"${val:.2f}",
+            kpi_caption(cmp),
             showcase=kpi_showcase(cmp),
             showcase_layout="left center",
             theme=cmp["theme"],
@@ -414,7 +390,9 @@ def server(input, output, session):
         val = (filtered_data()["Inspection results"] == "Pass").mean() * 100
         cmp = compare(val, BASELINE["pass_rate"], higher_is_better=True)
         return ui.value_box(
-            "Inspection Pass Rate", f"{val:.1f}%", kpi_caption(cmp),
+            "Inspection Pass Rate",
+            f"{val:.1f}%",
+            kpi_caption(cmp),
             showcase=kpi_showcase(cmp),
             showcase_layout="left center",
             theme=cmp["theme"],
@@ -423,7 +401,9 @@ def server(input, output, session):
     # Defect Rate Scatter plot
     @render_altair
     def plot_defect_sku():
-        selection = alt.selection_point(name="point", fields=["Supplier name"], on="click")
+        selection = alt.selection_point(
+            name="point", fields=["Supplier name"], on="click"
+        )
         return (
             alt.Chart(df)
             .mark_circle(size=80)
@@ -433,7 +413,7 @@ def server(input, output, session):
                 color=alt.Color(
                     "Supplier name:N", scale=alt.Scale(range=CP), title="Supplier"
                 ),
-                opacity = alt.condition(selection, alt.value(1.0), alt.value(0.10)),
+                opacity=alt.condition(selection, alt.value(1.0), alt.value(0.10)),
                 tooltip=[
                     "SKU",
                     "Supplier name",
@@ -443,7 +423,7 @@ def server(input, output, session):
             .add_params(selection)
             .properties(width="container", height=400)
         )
-    
+
     @reactive.effect
     def update_supplier():
         pt = reactive_read(plot_defect_sku.widget.selections, "point")
@@ -468,20 +448,25 @@ def server(input, output, session):
         # Call AI engine
         result = ai_engine.natural_language_to_filter(user_query, df)
 
-        if result['success'] and result['filter_code']:
+        if result["success"] and result["filter_code"]:
             # Apply filter
-            filtered = ai_engine.apply_filter(df, result['filter_code'])
+            filtered = ai_engine.apply_filter(df, result["filter_code"])
             ai_filtered_data_store.set(filtered)
 
             # AI response
-            ai_response = f"✅ **{result['explanation']}**\n\n" \
-                         f"📊 Found **{len(filtered)}** matching records (out of {len(df)} total)\n\n" \
-                         f"Data table and charts have been updated - check the results below!"
+            ai_response = (
+                f"✅ **{result['explanation']}**\n\n"
+                f"📊 Found **{len(filtered)}** matching records (out of {len(df)} total)\n\n"
+                f"Data table and charts have been updated - check the results below!"
+            )
         else:
-            ai_response = f"❌ {result['error']}" if result['error'] else \
-                         "Unable to process this query. Please try:\n" \
-                         "- Use simpler language\n" \
-                         "- Specify conditions explicitly (e.g., '>3' instead of 'very high')"
+            ai_response = (
+                f"❌ {result['error']}"
+                if result["error"]
+                else "Unable to process this query. Please try:\n"
+                "- Use simpler language\n"
+                "- Specify conditions explicitly (e.g., '>3' instead of 'very high')"
+            )
 
         # Append AI response
         await chat.append_message(ai_response)
@@ -490,9 +475,7 @@ def server(input, output, session):
     def ai_filtered_table():
         """Display AI-filtered data"""
         return render.DataTable(
-            ai_filtered_data_store.get(),
-            height="450px",
-            width="100%"
+            ai_filtered_data_store.get(), height="450px", width="100%"
         )
 
     @render_altair
@@ -501,24 +484,32 @@ def server(input, output, session):
         data = ai_filtered_data_store.get()
 
         if data.empty:
-            return alt.Chart(pd.DataFrame({'message': ['No data']})).mark_text(
-                text='No data', size=20, color='gray'
-            ).properties(width='container', height=300)
+            return (
+                alt.Chart(pd.DataFrame({"message": ["No data"]}))
+                .mark_text(text="No data", size=20, color="gray")
+                .properties(width="container", height=300)
+            )
 
         return (
             alt.Chart(data)
             .mark_bar()
             .encode(
-                x=alt.X('Supplier name:N', title='Supplier', axis=alt.Axis(labelAngle=-45)),
-                y=alt.Y('mean(Defect rates):Q', title='Avg Defect Rate (%)'),
-                color=alt.Color('Supplier name:N', scale=alt.Scale(range=CP), legend=None),
+                x=alt.X(
+                    "Supplier name:N", title="Supplier", axis=alt.Axis(labelAngle=-45)
+                ),
+                y=alt.Y("mean(Defect rates):Q", title="Avg Defect Rate (%)"),
+                color=alt.Color(
+                    "Supplier name:N", scale=alt.Scale(range=CP), legend=None
+                ),
                 tooltip=[
-                    alt.Tooltip('Supplier name:N', title='Supplier'),
-                    alt.Tooltip('mean(Defect rates):Q', format='.2f', title='Avg Defect Rate'),
-                    alt.Tooltip('count():Q', title='Records')
-                ]
+                    alt.Tooltip("Supplier name:N", title="Supplier"),
+                    alt.Tooltip(
+                        "mean(Defect rates):Q", format=".2f", title="Avg Defect Rate"
+                    ),
+                    alt.Tooltip("count():Q", title="Records"),
+                ],
             )
-            .properties(width='container', height=300)
+            .properties(width="container", height=300)
         )
 
     @render_altair
@@ -527,19 +518,27 @@ def server(input, output, session):
         data = ai_filtered_data_store.get()
 
         if data.empty:
-            return alt.Chart(pd.DataFrame({'message': ['No data']})).mark_text(
-                text='No data', size=20, color='gray'
-            ).properties(width='container', height=300)
+            return (
+                alt.Chart(pd.DataFrame({"message": ["No data"]}))
+                .mark_text(text="No data", size=20, color="gray")
+                .properties(width="container", height=300)
+            )
 
         return (
             alt.Chart(data)
             .mark_boxplot()
             .encode(
-                x=alt.X('Transportation modes:N', title='Transport Mode', axis=alt.Axis(labelAngle=-45)),
-                y=alt.Y('Shipping costs:Q', title='Shipping Cost ($)'),
-                color=alt.Color('Transportation modes:N', scale=alt.Scale(range=CP), legend=None)
+                x=alt.X(
+                    "Transportation modes:N",
+                    title="Transport Mode",
+                    axis=alt.Axis(labelAngle=-45),
+                ),
+                y=alt.Y("Shipping costs:Q", title="Shipping Cost ($)"),
+                color=alt.Color(
+                    "Transportation modes:N", scale=alt.Scale(range=CP), legend=None
+                ),
             )
-            .properties(width='container', height=300)
+            .properties(width="container", height=300)
         )
 
     @render.download(filename="ai_filtered_supply_chain.csv")
@@ -550,8 +549,10 @@ def server(input, output, session):
     @render.text
     def query_stats():
         """Display query statistics"""
-        return f"Queries used: {ai_engine.query_count}/{ai_engine.max_queries_per_session}\n" \
-               f"Records shown: {len(ai_filtered_data_store.get())}"
+        return (
+            f"Queries used: {ai_engine.query_count}/{ai_engine.max_queries_per_session}\n"
+            f"Records shown: {len(ai_filtered_data_store.get())}"
+        )
 
 
 app = App(app_ui, server)
