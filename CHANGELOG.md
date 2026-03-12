@@ -7,36 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [0.4.0] - 2026-03-(TODO)
+## [0.4.0] - 2026-03-15
 
 ### Added
 
-- `reports/m2_spec.md` as per App specification requirements. ([#25](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/25))
-- Changelog file ([#31](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/31))
-- `.gitignore` file
-- `requirements.txt` file for Posit Cloud ([#24](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/24))
-- Footer to the Dashboard with GitHub link, Author names, and Last Updated date  ([#33](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/33))
-- Data page with `DataTable` using tabs for organized data viewing ([#36](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/36))
-- `filters` toggle switch in Data tab to show/hide column filtering UI in the data table
-- Dev branch for staging and preview deployments
-- CI/CD pipeline deploying to Posit Connect Cloud (stable on `main`, preview on `dev`)
+- `Makefile` for test setup + running tests ([#61](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/61))
+- Created `compare.py` by extracting `def compare()` to its own file to enable testing ([#61](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/61))
+- `test_ui.py` for end to end tests ([#61](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/61))
 
 ### Changed
 
-- Updated `reports/m2_spec.md` to reflect actual implementation:
-  - Added Data tab components (filters toggle, download buttons) to Component Inventory
-  - Enhanced Reactivity Diagram with separate sections for Dashboard and Data tabs
-  - Expanded Calculation Details with detailed transformation logic and auxiliary components
-  - Updated total component count from 12 to 15 components
-  - Added component summary statistics and revision history
-- Moved download buttons to Data page for better organization ([#36](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/36))
-- Repositioned KPIs to top of dashboard for improved visibility ([#29](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/29))
-- Updated `environment.yml` to include Altair and standardized package versions ([#32](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/32))
-- Move app dependencies to `requirements.txt` ([#24](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/24))
-- `README` instructions ([#24](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/24))
-- Revised Job Stories #3 and #4 in `m2_spec.md`:
-  - Job Story #3: Shifted focus from "lead times and stock levels" to stock availability visualization
-  - Job Story #4: Changed from "revenue and sales KPIs" to inspection pass rate and manufacturing cost per unit
+- Updated `requirements.txt` to include `pytest` and `pytest-playwright` ([#61](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/61))
+- `README` instructions ([#63](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/63))
 
 ### Fixed
 
