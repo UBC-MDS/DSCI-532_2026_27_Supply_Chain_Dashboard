@@ -63,12 +63,13 @@ To run all tests (Unit + UI), ensure the app is running in the background:
 1. Start the app: `shiny run src/app.py`
 2. Run tests: `pytest` (Make sure to open a browser and go to `localhost:8000`)
 
-### Automated Testing
-To run the full test suite (Unit + UI) in a **single command**, ensure you have installed the requirements, then run:
+### Makefile
+Alternatively, use the `Makefile` to do the installation and testing in a **single command**. Run the below command:
 
 ```bash
-shiny run src/app.py --port 8000 & sleep 3 && pytest && pkill -f "shiny run"
+make test-all
 ```
+You should see that 7 tests have passed successfully.
 
 ## Contributing
 

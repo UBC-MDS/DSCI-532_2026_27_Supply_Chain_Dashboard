@@ -1,6 +1,6 @@
 .PHONY: test install
 
-install:
+setup:
 	pip install -r requirements.txt
 	playwright install chromium
 
@@ -13,3 +13,5 @@ test:
 	EXIT_CODE=$$?; \
 	pkill -f "shiny run" || true; \
 	exit $$EXIT_CODE
+
+test-all: setup test
