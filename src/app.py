@@ -10,6 +10,7 @@ import os
 import sys
 from pathlib import Path
 import pathlib
+import ibis
 from ai_query_engine import SupplyChainAIEngine
 from compare import compare
 
@@ -21,9 +22,14 @@ if str(_current_dir) not in sys.path:
 # Load environment variables
 load_dotenv()
 
-# Load data globally
+# Setup DuckDB connection via ibis
 _app_dir = pathlib.Path(__file__).parent.parent
-df = pd.read_csv(_app_dir / "data" / "raw" / "supply_chain_data.csv")
+_parquet_path = str(_app_dir / "data" / "processed" / "supply_chain_data.parquet")
+con = ibis.duckdb.connect()
+supply_chain_table = con.read_parquet(_parquet_path, table_name="supply_chain")
+
+# Load full data for baseline calculations and AI engine
+df = supply_chain_table.to_pandas()
 
 # Colorblind-friendly palette (Okabe-Ito)
 # Blue, Orange, Green, Pink, Yellow, Light Blue, Light Orange
@@ -285,15 +291,18 @@ def server(input, output, session):
 
     @reactive.calc
     def filtered_data():
-        df_copy = df.copy()
+        query = supply_chain_table
+
         if input.input_product_type() != "All":
-            df_copy = df_copy[df_copy["Product type"] == input.input_product_type()]
+            query = query.filter(query["Product type"] == input.input_product_type())
+
         if input.input_supplier() != "All":
-            df_copy = df_copy[df_copy["Supplier name"] == input.input_supplier()]
-        df_copy = df_copy[
-            df_copy["Transportation modes"].isin(input.input_transport_mode())
-        ]
-        return df_copy
+            query = query.filter(query["Supplier name"] == input.input_supplier())
+
+        if input.input_transport_mode():
+            query = query.filter(query["Transportation modes"].isin(input.input_transport_mode()))
+
+        return query.to_pandas()
 
     @render.download(filename="supply_chain_all.csv")
     def download_all():
