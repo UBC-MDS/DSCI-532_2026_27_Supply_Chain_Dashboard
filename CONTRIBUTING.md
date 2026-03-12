@@ -16,6 +16,7 @@ Thank you for contributing to our Supply Chain Analytics Dashboard! This interac
 - [Testing](#testing)
 - [Documentation](#documentation)
 - [Getting Help](#getting-help)
+- [Milestone 3 Retrospective and Milestone 4 Norms](#milestone-3-retrospective-and-milestone-4-norms)
 
 ## Code of Conduct
 
@@ -396,3 +397,13 @@ If you have questions or suggestions about this contributing guide, please:
 - Bring it up during team meetings
 
 We appreciate your contributions to making supply chain management more data-driven and efficient.
+
+## Milestone 3 Retrospective and Milestone 4 Norms
+Overall, I think our team worked so far in the project. Everyone has shown that they are committed to completing their deliverables far in advance of the deadline, as described in the Team Charter we agreed on at the beginning of the project. No issues were encountered regarding team communication. Everyone has been responsive on Slack and to feedback that we provide each other either in passing or as a comment on Pull Requests. The team has been good about communicating times of unavailability and it has not lead to anyone having to step in and "pick up the slack" of another team member. 
+
+One thing we could improve on is having more structure to the working session during lab time. Over the past weeks it was observed that the lab time working session was more of a scramble to tie up any loose ends, which resulted in more time than needed being dedicated to deciding what everyone will be working on versus actually doing the work. For our last lab session, we are planning to implement the following agenda:
+1. Greetings and catch-up (5 minutes)
+2. Pressing issues and questions (5 minutes)
+3. Progress update on outstanding items or assignment of outstanding items (10 minutes)
+
+This should hopefully allow us to get our priorities clear at the beginning of the lab working session and keep everyone updated on the progress of outstanding items and each member's responsibilities.
