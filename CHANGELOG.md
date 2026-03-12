@@ -7,6 +7,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.4.0] - 2026-03-15
+
+### Added
+
+- `Makefile` for test setup + running tests ([#61](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/61))
+- Created `compare.py` by extracting `def compare()` to its own file to enable testing ([#61](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/61))
+- `test_ui.py` for end to end tests ([#61](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/61))
+
+### Changed
+
+- Updated `requirements.txt` to include `pytest` and `pytest-playwright` ([#61](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/61))
+- `README` instructions ([#63](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/63))
+
+### Fixed
+
+
+
+### Known Issues
+
+
+
+### Reflection
+
+**Function extraction:**
+- **`compare`**: The compare function handled the logic for the KPI indicators, showing what kind of changes the current selection had against the baseline.
+
+**Unit tests:**
+- The three tests cover various scenarios that the `compare` function could face
+
+**UI tests:**
+- The four tests cover different behaviours (Transport filter, Supplier filter, Navigation, and Download button)
+
+**Challenge:**
+- Figuring out what part of the `app.py` code to refactor/extract out
+- Testing the asynchronous nature of the dashboard
+
+**Strengths:**
+- Unit tests check basic behaviour for business rules (success vs danger thresholds)
+- UI tests perform integration testing and ensure the app runs as expected (reflected on the UI)
+
+**Areas for Improvement:**
+- Add more tests to increase code coverage (possibly include the use of some tools to track coverage)
+- Integrate testing into a GitHub Actions workflow
+
+---
+
 ## [0.3.0] - 2026-02-08
 
 ### Fixed
