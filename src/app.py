@@ -57,9 +57,39 @@ app_ui = ui.page_fluid(
     # Custom CSS stylesheet
     ui.head_content(
         ui.tags.link(rel="stylesheet", href="apple-style.css"),
-        # Aurora background orbs
-        ui.HTML(
-            """
+        ui.tags.style("""
+            /* Force the page to fit the viewport with no scroll */
+            html, body { height: 100vh; overflow: hidden; margin: 0; padding: 0; }
+            .container-fluid { height: 100vh; overflow: hidden; padding: 0 12px; }
+
+            /* Tighten card padding so charts get more room */
+            .card-body { padding: 4px !important; }
+            .card-header { padding: 4px 8px !important; font-size: 0.8rem; }
+
+            /* Remove excess margin from value boxes */
+            .value-box { min-height: 0 !important; }
+            .value-box .value-box-grid { padding: 6px 10px !important; }
+
+            /* Tighten sidebar internals */
+            .sidebar { padding: 8px !important; font-size: 0.85rem; }
+            .sidebar h5 { margin-bottom: 6px !important; font-size: 0.9rem; }
+            .sidebar .shiny-input-container { margin-bottom: 6px !important; }
+            label { font-size: 0.8rem !important; margin-bottom: 2px !important; }
+
+            /* Nav pills row — reduce vertical space */
+            .nav-pills { margin-bottom: 4px !important; }
+            .tab-content { overflow: hidden; }
+
+            /* Layout sidebar — fix height so it doesn't overflow */
+            .bslib-sidebar-layout {
+                height: calc(100vh - 90px) !important;
+                overflow: hidden;
+            }
+            .bslib-sidebar-layout > .main {
+                overflow: hidden;
+            }
+        """),
+        ui.HTML("""
             <div class="aurora-orb aurora-orb-1"></div>
             <div class="aurora-orb aurora-orb-2"></div>
             <div class="aurora-orb aurora-orb-3"></div>
@@ -68,7 +98,7 @@ app_ui = ui.page_fluid(
     ),
     ui.div(
         ui.panel_title("✨ Supply Chain Dashboard"),
-        style="margin-top: 15px; margin-bottom: 15px;",
+        style="margin: 6px 0; line-height: 1;",
     ),
     ui.navset_pill(
         ui.nav_panel(
@@ -100,49 +130,59 @@ app_ui = ui.page_fluid(
                             f"🔗 [View on GitHub](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard) • "
                             f"**Last Updated:** {date.today()}"
                         ),
-                        style="text-align: center; opacity: 0.8; font-size: 14px; margin-top: 250px;",
+                        style="text-align: center; opacity: 0.8; font-size: 12px;",
                     ),
                     open="desktop",
+                    width=220,
                 ),
                 ui.layout_columns(
+                    # LEFT COLUMN
                     ui.layout_columns(
+                        # KPI row
                         ui.layout_columns(
                             ui.output_ui("value_cost_unit"),
                             ui.output_ui("value_pass_rate"),
                             col_widths=[6, 6],
+                            style="height:70px;",
                         ),
+                        # Defect scatter
                         ui.card(
                             ui.card_header("🔍 Defect Rates by SKU"),
                             output_widget("plot_defect_sku"),
                             full_screen=True,
+                            style="height:270px;",
                         ),
+                        # Customer demo + Availability
                         ui.layout_columns(
                             ui.card(
                                 ui.card_header("👥 Customer Demographics"),
                                 output_widget("plot_customer_demo"),
                                 full_screen=True,
-                                height="200px",
+                                style="height:190px;",
                             ),
                             ui.card(
                                 ui.card_header("📦 Stock Availability"),
                                 output_widget("plot_availability"),
                                 full_screen=True,
-                                height="200px",
+                                style="height:190px;",
                             ),
                             col_widths=[6, 6],
                         ),
                         col_widths=[12, 12, 12],
                     ),
+                    # RIGHT COLUMN
                     ui.layout_columns(
                         ui.card(
                             ui.card_header("🌡️ Shipping Cost Matrix (Route vs. Mode)"),
                             output_widget("plot_route_heatmap"),
                             full_screen=True,
+                            style="height:250px;",
                         ),
                         ui.card(
                             ui.card_header("⚖️ Cost vs. Time Tradeoff by Mode"),
                             output_widget("plot_cost_time_faceted"),
                             full_screen=True,
+                            style="height:280px;",
                         ),
                         col_widths=[12, 12],
                     ),
@@ -188,7 +228,7 @@ app_ui = ui.page_fluid(
                         ui.card_header("💬 AI Assistant"),
                         chat_ui(id="ai_chat"),
                         full_screen=True,
-                        height="550px",
+                        style="height:550px;",
                     ),
                     ui.card(
                         ui.card_header("📋 Filtered Results"),
@@ -335,7 +375,7 @@ def server(input, output, session):
                     alt.Tooltip("Value:Q", format=".2f", title="Avg Value"),
                 ],
             )
-            .properties(width=850, height=170)
+            .properties(width=850, height=75)
             .resolve_scale(y="independent")
         )
 
@@ -421,7 +461,7 @@ def server(input, output, session):
                 ],
             )
             .add_params(selection)
-            .properties(width="container", height=400)
+            .properties(width="container", height=300)
         )
 
     @reactive.effect
