@@ -128,6 +128,7 @@ app_ui = ui.page_fluid(
                         "Supplier",
                         ["All"] + sorted(df["Supplier name"].unique().tolist()),
                     ),
+                    ui.input_action_button("clear_all", "Reset Filters", class_="btn-primary btn-sm"),
                     ui.hr(),
                     ui.div(
                         ui.markdown(
@@ -451,10 +452,10 @@ def server(input, output, session):
     @render_altair
     def plot_defect_sku():
         selection = alt.selection_point(
-            name="point", fields=["Supplier name"], on="click"
+            name="point", fields=["Supplier name"], on="click", toggle=True, clear="dblclick"
         )
         return (
-            alt.Chart(df)
+            alt.Chart(filtered_data())
             .mark_circle(size=80)
             .encode(
                 x=alt.X("SKU:N", axis=alt.Axis(labels=False), title="SKUs"),
@@ -478,8 +479,13 @@ def server(input, output, session):
         pt = reactive_read(plot_defect_sku.widget.selections, "point")
         if pt and pt.value:
             ui.update_select("input_supplier", selected=pt.value[0]["Supplier name"])
-        else:
-            ui.update_select("input_supplier", selected="All")
+
+    @reactive.effect
+    def reset_button():
+        input.clear_all()
+        ui.update_select("input_supplier", selected="All")
+        ui.update_select("input_product_type", selected="All")
+        ui.update_checkbox_group("input_transport_mode", selected=df["Transportation modes"].unique().tolist())
 
     # ==================== AI Explorer ====================
 
