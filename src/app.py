@@ -178,11 +178,7 @@ app_ui = ui.page_fluid(
                     ui.h5("💬 AI Assistant"),
                     ui.markdown(
                         "**✨ Ask questions in natural language!**\n\n"
-                        "💡 Try these examples:\n\n"
-                        "• Show high defect rate products\n"
-                        "• Find cheapest shipping routes\n"
-                        "• Which supplier has best quality?\n"
-                        "• Products with cost > $50"
+                        "💡 Click a suggestion below to get started:"
                     ),
                     ui.hr(),
                     ui.markdown("**📊 Session Statistics**"),
@@ -194,6 +190,19 @@ app_ui = ui.page_fluid(
                     ui.card(
                         ui.card_header("💬 AI Assistant"),
                         chat_ui(id="ai_chat"),
+                        ui.div(
+                            ui.h6("💡 Suggested Prompts:", style="margin-top: 10px; margin-bottom: 8px; font-weight: 600;"),
+                            ui.div(
+                                ui.input_action_button("prompt_expensive", "Top 10 most expensive", class_="btn-sm btn-outline-primary", style="margin: 3px;"),
+                                ui.input_action_button("prompt_defects", "Defect rate > 3%", class_="btn-sm btn-outline-primary", style="margin: 3px;"),
+                                ui.input_action_button("prompt_routes", "Top 10 cheapest routes", class_="btn-sm btn-outline-primary", style="margin: 3px;"),
+                                ui.input_action_button("prompt_quality", "Low defect rate < 2%", class_="btn-sm btn-outline-primary", style="margin: 3px;"),
+                                ui.input_action_button("prompt_cost_filter", "Cost over $50", class_="btn-sm btn-outline-primary", style="margin: 3px;"),
+                                ui.input_action_button("prompt_skincare", "Skincare products", class_="btn-sm btn-outline-primary", style="margin: 3px;"),
+                                style="display: flex; flex-wrap: wrap; gap: 2px;"
+                            ),
+                            style="padding: 10px; background-color: #f8f9fa; border-radius: 5px; margin-bottom: 10px;"
+                        ),
                         full_screen=True,
                         height="550px",
                     ),
@@ -242,12 +251,9 @@ def server(input, output, session):
 
     # Add welcome message
     @reactive.effect
-    def _():
-        chat.append_message(
-            "👋 Hi! I can help you filter and analyze the supply chain data. Try asking:\n\n"
-            "- 'Show products with defect rate > 3%'\n"
-            "- 'Find cheapest shipping routes'\n"
-            "- 'Which supplier has the best quality?'"
+    async def _():
+        await chat.append_message(
+            "👋 Hi! I can help you filter and analyze the supply chain data. Try clicking a suggested prompt below or ask your own question!"
         )
 
     @reactive.calc
@@ -446,6 +452,45 @@ def server(input, output, session):
 
     # ==================== AI Explorer ====================
 
+    suggested_prompts = {
+        "prompt_expensive": "Show top 10 most expensive items by manufacturing cost",
+        "prompt_defects": "Show products with defect rate greater than 3%",
+        "prompt_routes": "Show top 10 cheapest shipping routes",
+        "prompt_quality": "Show products with defect rate less than 2%",
+        "prompt_cost_filter": "Show products with manufacturing cost over $50",
+        "prompt_skincare": "Show all skincare products"
+    }
+
+    @reactive.effect
+    @reactive.event(input.prompt_expensive)
+    def handle_prompt_expensive():
+        chat.update_user_input(value=suggested_prompts["prompt_expensive"])
+
+    @reactive.effect
+    @reactive.event(input.prompt_defects)
+    def handle_prompt_defects():
+        chat.update_user_input(value=suggested_prompts["prompt_defects"])
+
+    @reactive.effect
+    @reactive.event(input.prompt_routes)
+    def handle_prompt_routes():
+        chat.update_user_input(value=suggested_prompts["prompt_routes"])
+
+    @reactive.effect
+    @reactive.event(input.prompt_quality)
+    def handle_prompt_quality():
+        chat.update_user_input(value=suggested_prompts["prompt_quality"])
+
+    @reactive.effect
+    @reactive.event(input.prompt_cost_filter)
+    def handle_prompt_cost_filter():
+        chat.update_user_input(value=suggested_prompts["prompt_cost_filter"])
+
+    @reactive.effect
+    @reactive.event(input.prompt_skincare)
+    def handle_prompt_skincare():
+        chat.update_user_input(value=suggested_prompts["prompt_skincare"])
+
     @chat.on_user_submit
     async def handle_chat_input():
         """Handle user chat input"""
@@ -473,11 +518,11 @@ def server(input, output, session):
             )
         else:
             ai_response = (
-                f"❌ {result['error']}"
+                f"💡 {result['error']}"
                 if result["error"]
-                else "Unable to process this query. Please try:\n"
-                "- Use simpler language\n"
-                "- Specify conditions explicitly (e.g., '>3' instead of 'very high')"
+                else "💡 I can help you filter data! Try:\n"
+                "• Use specific conditions (e.g., 'cost > 50')\n"
+                "• Click the suggested prompts below"
             )
 
         # Append AI response
