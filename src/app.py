@@ -456,13 +456,14 @@ def server(input, output, session):
         )
         return (
             alt.Chart(filtered_data())
-            .mark_circle(size=80)
+            .mark_point(size=80, filled=True)
             .encode(
                 x=alt.X("SKU:N", axis=alt.Axis(labels=False), title="SKUs"),
                 y=alt.Y("Defect rates:Q", title="Defect Rate (%)"),
                 color=alt.Color(
                     "Supplier name:N", scale=alt.Scale(range=CP), title="Supplier"
                 ),
+                shape=alt.Shape("Supplier name:N", title="Supplier"),
                 opacity=alt.condition(selection, alt.value(1.0), alt.value(0.10)),
                 tooltip=[
                     "SKU",
