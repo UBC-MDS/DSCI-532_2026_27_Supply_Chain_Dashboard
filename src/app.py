@@ -77,10 +77,10 @@ app_ui = ui.page_fluid(
             .value-box .value-box-grid { padding: 6px 10px !important; }
 
             /* Tighten sidebar internals */
-            .sidebar { padding: 8px !important; font-size: 0.85rem; }
-            .sidebar h5 { margin-bottom: 6px !important; font-size: 0.9rem; }
-            .sidebar .shiny-input-container { margin-bottom: 6px !important; }
-            label { font-size: 0.8rem !important; margin-bottom: 2px !important; }
+            .sidebar { padding: 12px !important; font-size: 0.85rem; }
+            .sidebar h5 { margin-bottom: 12px !important; font-size: 0.9rem; }
+            .sidebar .shiny-input-container { margin-bottom: 15px !important; }
+            label { font-size: 0.8rem !important; margin-bottom: 10px !important; }
 
             /* Nav pills row — reduce vertical space */
             .nav-pills { margin-bottom: 4px !important; }
@@ -255,11 +255,14 @@ app_ui = ui.page_fluid(
                     col_widths=[12, 12, 6, 6],
                 ),
                 ui.layout_columns(
-                    ui.download_button(
-                        "download_ai_filtered",
-                        "⬇ Download Filtered Data (CSV)",
-                        class_="btn-success btn-lg",
-                        width="100%",
+                    ui.div(
+                        ui.download_button(
+                            "download_ai_filtered",
+                            "⬇ Download Filtered Data (CSV)",
+                            class_="btn-success btn-lg",
+                            width="100%",
+                        ),
+                        style = "text-align: center; padding-bottom: 20px;"
                     ),
                     col_widths=[12],
                 ),
@@ -385,7 +388,7 @@ def server(input, output, session):
                     alt.Tooltip("Value:Q", format=".2f", title="Avg Value"),
                 ],
             )
-            .properties(width=850, height=75)
+            .properties(width=730, height=150)
             .resolve_scale(y="independent")
         )
 
