@@ -128,6 +128,7 @@ app_ui = ui.page_fluid(
                         "Supplier",
                         ["All"] + sorted(df["Supplier name"].unique().tolist()),
                     ),
+                    ui.input_action_button("clear_all", "Reset Filters", class_="btn-primary btn-sm"),
                     ui.hr(),
                     ui.div(
                         ui.markdown(
@@ -454,17 +455,18 @@ def server(input, output, session):
     @render_altair
     def plot_defect_sku():
         selection = alt.selection_point(
-            name="point", fields=["Supplier name"], on="click"
+            name="point", fields=["Supplier name"], on="click", toggle=True, clear="dblclick"
         )
         return (
-            alt.Chart(df)
-            .mark_circle(size=80)
+            alt.Chart(filtered_data())
+            .mark_point(size=80, filled=True)
             .encode(
                 x=alt.X("SKU:N", axis=alt.Axis(labels=False), title="SKUs"),
                 y=alt.Y("Defect rates:Q", title="Defect Rate (%)"),
                 color=alt.Color(
                     "Supplier name:N", scale=alt.Scale(range=CP), title="Supplier"
                 ),
+                shape=alt.Shape("Supplier name:N", title="Supplier"),
                 opacity=alt.condition(selection, alt.value(1.0), alt.value(0.10)),
                 tooltip=[
                     "SKU",
@@ -481,8 +483,13 @@ def server(input, output, session):
         pt = reactive_read(plot_defect_sku.widget.selections, "point")
         if pt and pt.value:
             ui.update_select("input_supplier", selected=pt.value[0]["Supplier name"])
-        else:
-            ui.update_select("input_supplier", selected="All")
+
+    @reactive.effect
+    def reset_button():
+        input.clear_all()
+        ui.update_select("input_supplier", selected="All")
+        ui.update_select("input_product_type", selected="All")
+        ui.update_checkbox_group("input_transport_mode", selected=df["Transportation modes"].unique().tolist())
 
     # ==================== AI Explorer ====================
 
