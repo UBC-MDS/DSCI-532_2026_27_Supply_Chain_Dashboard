@@ -8,6 +8,8 @@ def test_transport_mode_impact_on_kpis(page: Page):
     """Verify that unchecking a transport mode updates the KPI value."""
     page.goto(BASE_URL)
 
+    print(page.content())
+
     # Wait for KPI card
     page.get_by_text("Avg. Cost per Unit").wait_for(timeout=15000)
 

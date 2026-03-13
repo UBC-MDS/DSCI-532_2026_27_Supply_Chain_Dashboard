@@ -12,12 +12,13 @@ from pathlib import Path
 import pathlib
 import ibis
 from ai_query_engine import SupplyChainAIEngine
-from compare import compare
 
 # Add src directory to Python path
-_current_dir = Path(__file__).parent
-if str(_current_dir) not in sys.path:
-    sys.path.insert(0, str(_current_dir))
+_project_root = Path(__file__).resolve().parent.parent
+if str(_project_root) not in sys.path:
+    sys.path.insert(0, str(_project_root))
+
+from compare import compare
 
 # Load environment variables
 load_dotenv()
@@ -260,7 +261,9 @@ def server(input, output, session):
             query = query.filter(query["Supplier name"] == input.input_supplier())
 
         if input.input_transport_mode():
-            query = query.filter(query["Transportation modes"].isin(input.input_transport_mode()))
+            query = query.filter(
+                query["Transportation modes"].isin(input.input_transport_mode())
+            )
 
         return query.to_pandas()
 
