@@ -90,11 +90,12 @@ Dataset structure:
 {schema}
 
 **Core Rules**:
-1. Only return valid pandas boolean indexing expressions
-2. Use df[condition] syntax, conditions can be combined with & | ~
+1. Only return valid pandas boolean indexing expressions that return FULL ROWS (DataFrame), not single columns
+2. Use df[condition] syntax for filtering, conditions can be combined with & | ~
 3. String comparisons use == or .str.contains()
 4. Numeric comparisons use > < >= <= ==
-5. If the query is unclear or cannot be converted, return empty string and explain why in the explanation field
+5. ALWAYS return complete DataFrame rows, never just single columns like df['SKU']
+6. If the query is unclear or cannot be converted, return empty string and explain why in the explanation field
 
 **Examples**:
 - User: "Show products with defect rate > 3%"
@@ -105,6 +106,9 @@ Dataset structure:
 
 - User: "Top 10 records by shipping cost"
   → "df.nlargest(10, 'Shipping costs')"
+
+- User: "Most expensive item"
+  → "df.nlargest(1, 'Manufacturing costs')"
 
 Output format (pure JSON only):
 {{
@@ -137,6 +141,14 @@ Output format (pure JSON only):
                 end = response_text.rfind('}')
                 if start != -1 and end != -1:
                     response_text = response_text[start:end+1]
+                else:
+                    # No JSON found in response - user likely asked a general question
+                    return {
+                        'success': False,
+                        'filter_code': '',
+                        'explanation': '',
+                        'error': 'I can help you filter and analyze the supply chain data! Try asking:\n\n• "Show products with defect rate > 3%"\n• "Top 10 most expensive items"\n• "Products with cost over $50"\n• "All skincare products"\n\nOr click one of the suggested prompts below the chat!'
+                    }
 
             result = json.loads(response_text)
 
@@ -152,7 +164,7 @@ Output format (pure JSON only):
                 'success': False,
                 'filter_code': '',
                 'explanation': '',
-                'error': f'AI response format error. Please try rephrasing your query. (Details: {str(e)})'
+                'error': 'Let me help you with data filtering! Try asking:\n\n• "Show products with defect rate > 3%"\n• "Top 10 cheapest shipping routes"\n• "Manufacturing cost over $50"\n\nYou can also click the suggested prompts below!'
             }
         except Exception as e:
             return {
@@ -186,6 +198,14 @@ Output format (pure JSON only):
             else:
                 # Regular boolean indexing
                 filtered_df = eval(f"df[{filter_code}]", {"__builtins__": {}}, namespace)
+
+            # Ensure result is always a DataFrame
+            if isinstance(filtered_df, pd.Series):
+                filtered_df = filtered_df.to_frame()
+            elif not isinstance(filtered_df, pd.DataFrame):
+                # If it's a scalar or other type, return original df
+                print(f"⚠️ Filter returned non-DataFrame type: {type(filtered_df)}")
+                return df
 
             return filtered_df
 
