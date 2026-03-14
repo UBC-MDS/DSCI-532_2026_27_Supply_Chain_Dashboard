@@ -94,6 +94,10 @@ app_ui = ui.page_fluid(
             .bslib-sidebar-layout > .main {
                 overflow: hidden;
             }
+            /* Add space below Transportation Mode label */
+            .shiny-input-checkboxgroup > label {
+                margin-bottom: 15px !important;
+            }
         """),
         ui.HTML("""
             <div class="aurora-orb aurora-orb-1"></div>
@@ -140,7 +144,7 @@ app_ui = ui.page_fluid(
                         style="text-align: center; opacity: 0.8; font-size: 12px;",
                     ),
                     open="desktop",
-                    width=250,
+                    width=300,
                 ),
                 ui.layout_columns(
                     # LEFT COLUMN
