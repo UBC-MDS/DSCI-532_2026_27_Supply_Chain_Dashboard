@@ -108,37 +108,18 @@ app_ui = ui.page_fluid(
             .bslib-sidebar-layout > .main {
                 overflow: hidden;
             }
-
-            /* KPI Legend */
-            .legend-container {
-                padding: 6px 8px !important;
-                background: rgba(255,255,255,0.4);
-                border-radius: 8px;
-                border: 1px solid rgba(0,0,0,0.08);
-                margin: 4px 0;
-            }
-            .legend-row {
-                display: flex;
-                align-items: center;
-                font-size: 0.75rem;
-                line-height: 1.3;
-                margin-bottom: 2px;
-            }
-            .legend-row:last-child { margin-bottom: 0; }
-            .legend-dot {
-                display: inline-block;
-                width: 7px;
-                height: 7px;
-                border-radius: 50%;
-                margin-right: 6px;
-                flex-shrink: 0;
-            }
             /* Sidebar section headings - bold + slightly larger */
             .sidebar h5,
             .sidebar label.control-label,
             .sidebar .shiny-input-container > label:first-child {
                 font-weight: 700 !important;
                 color: rgba(0,0,0,0.75) !important;
+            }
+            /* Remove the default padding at the top of the sidebar content */
+            .bslib-sidebar-layout .sidebar-content {
+                padding-top: 0 !important;
+                display: flex;
+                flex-direction: column;
             }
             """
         ),
@@ -181,34 +162,71 @@ app_ui = ui.page_fluid(
                     ),
                     ui.hr(),
                     ui.div(
-                        ui.h6(
+                        ui.div(
                             "KPI LEGEND",
-                            style="font-size: 0.85rem; font-weight: 700; margin-bottom: 4px; opacity: 0.8;",
+                            style="font-size:0.65rem; font-weight:700; letter-spacing:0.06em; color:rgba(0,0,0,0.5); margin-bottom:6px; text-transform:uppercase;",
                         ),
+                        # Column headers
                         ui.div(
                             ui.div(
-                                ui.span(
-                                    class_="legend-dot", style="background:#28a745;"
-                                ),
-                                ui.span("Good: < 2% deviation"),
-                                class_="legend-row",
+                                "slight (<5%)",
+                                style="font-size:0.6rem; text-align:center; color:rgba(0,0,0,0.45);",
                             ),
                             ui.div(
-                                ui.span(
-                                    class_="legend-dot", style="background:#ffc107;"
-                                ),
-                                ui.span("Warn: 2-5% deviation"),
-                                class_="legend-row",
+                                "significant (≥5%)",
+                                style="font-size:0.6rem; text-align:center; color:rgba(0,0,0,0.45);",
                             ),
-                            ui.div(
-                                ui.span(
-                                    class_="legend-dot", style="background:#dc3545;"
-                                ),
-                                ui.span("Poor: > 5% deviation"),
-                                class_="legend-row",
-                            ),
+                            style="display:grid; grid-template-columns:1fr 1fr; gap:4px; margin-bottom:2px;",
                         ),
-                        class_="legend-container",
+                        # 2×2 grid
+                        ui.div(
+                            # Good + slight → teal
+                            ui.div(
+                                ui.HTML(
+                                    '<svg width="11" height="11" viewBox="0 0 12 12"><path d="M2 9L6 3L10 9" fill="none" stroke="#003d29" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+                                ),
+                                ui.span("Good, slight"),
+                                style="display:flex; align-items:center; gap:5px; font-size:0.68rem; font-weight:500; padding:4px 6px; border-radius:5px; background:#02bf7f; color:#003d29;",
+                            ),
+                            # Good + significant → success
+                            ui.div(
+                                ui.HTML(
+                                    '<svg width="11" height="11" viewBox="0 0 12 12"><path d="M2 9L6 3L10 9" fill="none" stroke="#e6f5e9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+                                ),
+                                ui.span("Good, signif."),
+                                style="display:flex; align-items:center; gap:5px; font-size:0.68rem; font-weight:500; padding:4px 6px; border-radius:5px; background:#008919; color:#e6f5e9;",
+                            ),
+                            # Poor + slight → warning
+                            ui.div(
+                                ui.HTML(
+                                    '<svg width="11" height="11" viewBox="0 0 12 12"><path d="M2 3L6 9L10 3" fill="none" stroke="#4a3300" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+                                ),
+                                ui.span("Poor, slight"),
+                                style="display:flex; align-items:center; gap:5px; font-size:0.68rem; font-weight:500; padding:4px 6px; border-radius:5px; background:#f9b927; color:#4a3300;",
+                            ),
+                            # Poor + significant → danger
+                            ui.div(
+                                ui.HTML(
+                                    '<svg width="11" height="11" viewBox="0 0 12 12"><path d="M2 3L6 9L10 3" fill="none" stroke="#ffe8e8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+                                ),
+                                ui.span("Poor, signif."),
+                                style="display:flex; align-items:center; gap:5px; font-size:0.68rem; font-weight:500; padding:4px 6px; border-radius:5px; background:#c10000; color:#ffe8e8;",
+                            ),
+                            style="display:grid; grid-template-columns:1fr 1fr; gap:4px; margin-bottom:6px;",
+                        ),
+                        # Divider
+                        ui.hr(
+                            style="margin:4px 0 !important; border-color:rgba(0,0,0,0.12);"
+                        ),
+                        # Stable row
+                        ui.div(
+                            ui.HTML(
+                                '<svg width="11" height="11" viewBox="0 0 12 12"><path d="M2 6H10" stroke="#383d41" stroke-width="1.8" stroke-linecap="round"/></svg>'
+                            ),
+                            ui.span("Stable (<1% deviation)"),
+                            style="display:flex; align-items:center; justify-content:center; gap:5px; font-size:0.68rem; font-weight:500; padding:4px 6px; border-radius:5px; background:#404040; color:#f0f0f0;",
+                        ),
+                        style="padding:6px 8px; background:rgba(255,255,255,0.4); border-radius:8px; border:0.5px solid rgba(0,0,0,0.1); margin:4px 0;",
                     ),
                     ui.hr(),
                     ui.div(
