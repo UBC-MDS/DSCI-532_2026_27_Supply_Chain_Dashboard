@@ -77,9 +77,9 @@ app_ui = ui.page_fluid(
             .value-box .value-box-grid { padding: 6px 10px !important; }
 
             /* Tighten sidebar internals */
-            .sidebar { padding: 12px !important; font-size: 0.85rem; }
-            .sidebar h5 { margin-bottom: 12px !important; font-size: 0.9rem; }
-            .sidebar .shiny-input-container { margin-bottom: 15px !important; }
+            .sidebar { padding: 20px !important; font-size: 0.85rem; }
+            .sidebar h5 { margin-bottom: 15px !important; font-size: 0.9rem; }
+            .sidebar .shiny-input-container { margin-bottom: 18px !important; }
             label { font-size: 0.8rem !important; margin-bottom: 10px !important; }
 
             /* Nav pills row — reduce vertical space */
@@ -140,7 +140,7 @@ app_ui = ui.page_fluid(
                         style="text-align: center; opacity: 0.8; font-size: 12px;",
                     ),
                     open="desktop",
-                    width=220,
+                    width=250,
                 ),
                 ui.layout_columns(
                     # LEFT COLUMN
@@ -165,13 +165,13 @@ app_ui = ui.page_fluid(
                                 ui.card_header("👥 Customer Demographics"),
                                 output_widget("plot_customer_demo"),
                                 full_screen=True,
-                                style="height:190px;",
+                                style="height:150px;",
                             ),
                             ui.card(
                                 ui.card_header("📦 Stock Availability"),
                                 output_widget("plot_availability"),
                                 full_screen=True,
-                                style="height:190px;",
+                                style="height:150px;",
                             ),
                             col_widths=[6, 6],
                         ),
@@ -388,7 +388,7 @@ def server(input, output, session):
                     alt.Tooltip("Value:Q", format=".2f", title="Avg Value"),
                 ],
             )
-            .properties(width=730, height=150)
+            .properties(width=600, height=170)
             .resolve_scale(y="independent")
         )
 
