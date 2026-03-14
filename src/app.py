@@ -64,7 +64,8 @@ app_ui = ui.page_fluid(
     # Custom CSS stylesheet
     ui.head_content(
         ui.tags.link(rel="stylesheet", href="apple-style.css"),
-        ui.tags.style("""
+        ui.tags.style(
+            """
             /* Force the page to fit the viewport with no scroll */
             html, body { height: 100vh; overflow: hidden; margin: 0; padding: 0; }
             .container-fluid { height: 100vh; overflow: hidden; padding: 0 12px; }
@@ -77,13 +78,25 @@ app_ui = ui.page_fluid(
             .value-box { min-height: 0 !important; }
             .value-box .value-box-grid { padding: 6px 10px !important; }
 
-            /* Tighten sidebar internals */
-            .sidebar { padding: 20px !important; font-size: 0.85rem; }
-            .sidebar h5 { margin-bottom: 15px !important; font-size: 0.9rem; }
-            .sidebar .shiny-input-container { margin-bottom: 18px !important; }
-            label { font-size: 0.8rem !important; margin-bottom: 10px !important; }
+            /* Sidebar: tighter overall padding */
+            .sidebar { padding: 10px 14px !important; font-size: 0.85rem; overflow: hidden !important; }
+            .sidebar h5 { margin-bottom: 8px !important; font-size: 0.9rem; }
 
-            /* Nav pills row — reduce vertical space */
+            /* All inputs: tighter gap between them */
+            .sidebar .shiny-input-container { margin-bottom: 8px !important; }
+
+            /* Labels: less bottom breathing room */
+            label { font-size: 0.8rem !important; margin-bottom: 4px !important; }
+
+            /* Checkbox group: kill the extra space after the last item */
+            .shiny-input-checkboxgroup { margin-bottom: 0 !important; }
+            .shiny-input-checkboxgroup .shiny-options-group { margin-bottom: 0 !important; }
+            .shiny-input-checkboxgroup > label { margin-bottom: 18px !important; }
+
+            /* HR: tight margins */
+            .sidebar hr { margin: 6px 0 !important; border-color: rgba(0,0,0,0.15); border-top-width: 1px; opacity: 0.6; }
+
+            /* Nav pills row */
             .nav-pills { margin-bottom: 4px !important; }
             .tab-content { overflow: hidden; }
 
@@ -95,12 +108,42 @@ app_ui = ui.page_fluid(
             .bslib-sidebar-layout > .main {
                 overflow: hidden;
             }
-            /* Add space below Transportation Mode label */
-            .shiny-input-checkboxgroup > label {
-                margin-bottom: 15px !important;
+
+            /* KPI Legend */
+            .legend-container {
+                padding: 6px 8px !important;
+                background: rgba(255,255,255,0.4);
+                border-radius: 8px;
+                border: 1px solid rgba(0,0,0,0.08);
+                margin: 4px 0;
             }
-        """),
-        ui.HTML("""
+            .legend-row {
+                display: flex;
+                align-items: center;
+                font-size: 0.75rem;
+                line-height: 1.3;
+                margin-bottom: 2px;
+            }
+            .legend-row:last-child { margin-bottom: 0; }
+            .legend-dot {
+                display: inline-block;
+                width: 7px;
+                height: 7px;
+                border-radius: 50%;
+                margin-right: 6px;
+                flex-shrink: 0;
+            }
+            /* Sidebar section headings - bold + slightly larger */
+            .sidebar h5,
+            .sidebar label.control-label,
+            .sidebar .shiny-input-container > label:first-child {
+                font-weight: 700 !important;
+                color: rgba(0,0,0,0.75) !important;
+            }
+            """
+        ),
+        ui.HTML(
+            """
             <div class="aurora-orb aurora-orb-1"></div>
             <div class="aurora-orb aurora-orb-2"></div>
             <div class="aurora-orb aurora-orb-3"></div>
@@ -133,7 +176,40 @@ app_ui = ui.page_fluid(
                         "Supplier",
                         ["All"] + sorted(df["Supplier name"].unique().tolist()),
                     ),
-                    ui.input_action_button("clear_all", "Reset Filters", class_="btn-primary btn-sm"),
+                    ui.input_action_button(
+                        "clear_all", "Reset Filters", class_="btn-primary btn-sm"
+                    ),
+                    ui.hr(),
+                    ui.div(
+                        ui.h6(
+                            "KPI LEGEND",
+                            style="font-size: 0.85rem; font-weight: 700; margin-bottom: 4px; opacity: 0.8;",
+                        ),
+                        ui.div(
+                            ui.div(
+                                ui.span(
+                                    class_="legend-dot", style="background:#28a745;"
+                                ),
+                                ui.span("Good: < 2% deviation"),
+                                class_="legend-row",
+                            ),
+                            ui.div(
+                                ui.span(
+                                    class_="legend-dot", style="background:#ffc107;"
+                                ),
+                                ui.span("Warn: 2-5% deviation"),
+                                class_="legend-row",
+                            ),
+                            ui.div(
+                                ui.span(
+                                    class_="legend-dot", style="background:#dc3545;"
+                                ),
+                                ui.span("Poor: > 5% deviation"),
+                                class_="legend-row",
+                            ),
+                        ),
+                        class_="legend-container",
+                    ),
                     ui.hr(),
                     ui.div(
                         ui.markdown(
@@ -236,17 +312,50 @@ app_ui = ui.page_fluid(
                         ui.card_header("💬 AI Assistant"),
                         chat_ui(id="ai_chat"),
                         ui.div(
-                            ui.h6("💡 Suggested Prompts:", style="margin-top: 10px; margin-bottom: 8px; font-weight: 600;"),
-                            ui.div(
-                                ui.input_action_button("prompt_expensive", "Top 10 most expensive", class_="btn-sm btn-outline-primary", style="margin: 3px;"),
-                                ui.input_action_button("prompt_defects", "Defect rate > 3%", class_="btn-sm btn-outline-primary", style="margin: 3px;"),
-                                ui.input_action_button("prompt_routes", "Top 10 cheapest routes", class_="btn-sm btn-outline-primary", style="margin: 3px;"),
-                                ui.input_action_button("prompt_quality", "Low defect rate < 2%", class_="btn-sm btn-outline-primary", style="margin: 3px;"),
-                                ui.input_action_button("prompt_cost_filter", "Cost over $50", class_="btn-sm btn-outline-primary", style="margin: 3px;"),
-                                ui.input_action_button("prompt_skincare", "Skincare products", class_="btn-sm btn-outline-primary", style="margin: 3px;"),
-                                style="display: flex; flex-wrap: wrap; gap: 2px;"
+                            ui.h6(
+                                "💡 Suggested Prompts:",
+                                style="margin-top: 10px; margin-bottom: 8px; font-weight: 600;",
                             ),
-                            style="padding: 10px; background-color: #f8f9fa; border-radius: 5px; margin-bottom: 10px;"
+                            ui.div(
+                                ui.input_action_button(
+                                    "prompt_expensive",
+                                    "Top 10 most expensive",
+                                    class_="btn-sm btn-outline-primary",
+                                    style="margin: 3px;",
+                                ),
+                                ui.input_action_button(
+                                    "prompt_defects",
+                                    "Defect rate > 3%",
+                                    class_="btn-sm btn-outline-primary",
+                                    style="margin: 3px;",
+                                ),
+                                ui.input_action_button(
+                                    "prompt_routes",
+                                    "Top 10 cheapest routes",
+                                    class_="btn-sm btn-outline-primary",
+                                    style="margin: 3px;",
+                                ),
+                                ui.input_action_button(
+                                    "prompt_quality",
+                                    "Low defect rate < 2%",
+                                    class_="btn-sm btn-outline-primary",
+                                    style="margin: 3px;",
+                                ),
+                                ui.input_action_button(
+                                    "prompt_cost_filter",
+                                    "Cost over $50",
+                                    class_="btn-sm btn-outline-primary",
+                                    style="margin: 3px;",
+                                ),
+                                ui.input_action_button(
+                                    "prompt_skincare",
+                                    "Skincare products",
+                                    class_="btn-sm btn-outline-primary",
+                                    style="margin: 3px;",
+                                ),
+                                style="display: flex; flex-wrap: wrap; gap: 2px;",
+                            ),
+                            style="padding: 10px; background-color: #f8f9fa; border-radius: 5px; margin-bottom: 10px;",
                         ),
                         full_screen=True,
                         style="height:550px;",
@@ -276,7 +385,7 @@ app_ui = ui.page_fluid(
                             class_="btn-success btn-lg",
                             width="100%",
                         ),
-                        style = "text-align: center; padding-bottom: 20px;"
+                        style="text-align: center; padding-bottom: 20px;",
                     ),
                     col_widths=[12],
                 ),
@@ -468,7 +577,11 @@ def server(input, output, session):
     @render_altair
     def plot_defect_sku():
         selection = alt.selection_point(
-            name="point", fields=["Supplier name"], on="click", toggle=True, clear="dblclick"
+            name="point",
+            fields=["Supplier name"],
+            on="click",
+            toggle=True,
+            clear="dblclick",
         )
         return (
             alt.Chart(filtered_data())
@@ -502,7 +615,10 @@ def server(input, output, session):
         input.clear_all()
         ui.update_select("input_supplier", selected="All")
         ui.update_select("input_product_type", selected="All")
-        ui.update_checkbox_group("input_transport_mode", selected=df["Transportation modes"].unique().tolist())
+        ui.update_checkbox_group(
+            "input_transport_mode",
+            selected=df["Transportation modes"].unique().tolist(),
+        )
 
     # ==================== AI Explorer ====================
 
@@ -512,7 +628,7 @@ def server(input, output, session):
         "prompt_routes": "Show top 10 cheapest shipping routes",
         "prompt_quality": "Show products with defect rate less than 2%",
         "prompt_cost_filter": "Show products with manufacturing cost over $50",
-        "prompt_skincare": "Show all skincare products"
+        "prompt_skincare": "Show all skincare products",
     }
 
     @reactive.effect
