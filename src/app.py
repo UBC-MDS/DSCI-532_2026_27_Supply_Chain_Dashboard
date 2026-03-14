@@ -64,7 +64,8 @@ app_ui = ui.page_fluid(
     # Custom CSS stylesheet
     ui.head_content(
         ui.tags.link(rel="stylesheet", href="apple-style.css"),
-        ui.tags.style("""
+        ui.tags.style(
+            """
             /* Force the page to fit the viewport with no scroll */
             html, body { height: 100vh; overflow: hidden; margin: 0; padding: 0; }
             .container-fluid { height: 100vh; overflow: hidden; padding: 0 12px; }
@@ -77,13 +78,25 @@ app_ui = ui.page_fluid(
             .value-box { min-height: 0 !important; }
             .value-box .value-box-grid { padding: 6px 10px !important; }
 
-            /* Tighten sidebar internals */
-            .sidebar { padding: 20px !important; font-size: 0.85rem; }
-            .sidebar h5 { margin-bottom: 15px !important; font-size: 0.9rem; }
-            .sidebar .shiny-input-container { margin-bottom: 18px !important; }
-            label { font-size: 0.8rem !important; margin-bottom: 10px !important; }
+            /* Sidebar: tighter overall padding */
+            .sidebar { padding: 10px 14px !important; font-size: 0.85rem; overflow: hidden !important; }
+            .sidebar h5 { margin-bottom: 8px !important; font-size: 0.9rem; }
 
-            /* Nav pills row — reduce vertical space */
+            /* All inputs: tighter gap between them */
+            .sidebar .shiny-input-container { margin-bottom: 8px !important; }
+
+            /* Labels: less bottom breathing room */
+            label { font-size: 0.8rem !important; margin-bottom: 4px !important; }
+
+            /* Checkbox group: kill the extra space after the last item */
+            .shiny-input-checkboxgroup { margin-bottom: 0 !important; }
+            .shiny-input-checkboxgroup .shiny-options-group { margin-bottom: 0 !important; }
+            .shiny-input-checkboxgroup > label { margin-bottom: 18px !important; }
+
+            /* HR: tight margins */
+            .sidebar hr { margin: 6px 0 !important; border-color: rgba(0,0,0,0.15); border-top-width: 1px; opacity: 0.6; }
+
+            /* Nav pills row */
             .nav-pills { margin-bottom: 4px !important; }
             .tab-content { overflow: hidden; }
 
@@ -95,12 +108,23 @@ app_ui = ui.page_fluid(
             .bslib-sidebar-layout > .main {
                 overflow: hidden;
             }
-            /* Add space below Transportation Mode label */
-            .shiny-input-checkboxgroup > label {
-                margin-bottom: 15px !important;
+            /* Sidebar section headings - bold + slightly larger */
+            .sidebar h5,
+            .sidebar label.control-label,
+            .sidebar .shiny-input-container > label:first-child {
+                font-weight: 700 !important;
+                color: rgba(0,0,0,0.75) !important;
             }
-        """),
-        ui.HTML("""
+            /* Remove the default padding at the top of the sidebar content */
+            .bslib-sidebar-layout .sidebar-content {
+                padding-top: 0 !important;
+                display: flex;
+                flex-direction: column;
+            }
+            """
+        ),
+        ui.HTML(
+            """
             <div class="aurora-orb aurora-orb-1"></div>
             <div class="aurora-orb aurora-orb-2"></div>
             <div class="aurora-orb aurora-orb-3"></div>
@@ -133,7 +157,77 @@ app_ui = ui.page_fluid(
                         "Supplier",
                         ["All"] + sorted(df["Supplier name"].unique().tolist()),
                     ),
-                    ui.input_action_button("clear_all", "Reset Filters", class_="btn-primary btn-sm"),
+                    ui.input_action_button(
+                        "clear_all", "Reset Filters", class_="btn-primary btn-sm"
+                    ),
+                    ui.hr(),
+                    ui.div(
+                        ui.div(
+                            "KPI LEGEND",
+                            style="font-size:0.65rem; font-weight:700; letter-spacing:0.06em; color:rgba(0,0,0,0.5); margin-bottom:6px; text-transform:uppercase;",
+                        ),
+                        # Column headers
+                        ui.div(
+                            ui.div(
+                                "slight (<5%)",
+                                style="font-size:0.6rem; text-align:center; color:rgba(0,0,0,0.45);",
+                            ),
+                            ui.div(
+                                "significant (≥5%)",
+                                style="font-size:0.6rem; text-align:center; color:rgba(0,0,0,0.45);",
+                            ),
+                            style="display:grid; grid-template-columns:1fr 1fr; gap:4px; margin-bottom:2px;",
+                        ),
+                        # 2×2 grid
+                        ui.div(
+                            # Good + slight → teal
+                            ui.div(
+                                ui.HTML(
+                                    '<svg width="11" height="11" viewBox="0 0 12 12"><path d="M2 9L6 3L10 9" fill="none" stroke="#003d29" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+                                ),
+                                ui.span("Good, slight"),
+                                style="display:flex; align-items:center; gap:5px; font-size:0.68rem; font-weight:500; padding:4px 6px; border-radius:5px; background:#02bf7f; color:#003d29;",
+                            ),
+                            # Good + significant → success
+                            ui.div(
+                                ui.HTML(
+                                    '<svg width="11" height="11" viewBox="0 0 12 12"><path d="M2 9L6 3L10 9" fill="none" stroke="#e6f5e9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+                                ),
+                                ui.span("Good, signif."),
+                                style="display:flex; align-items:center; gap:5px; font-size:0.68rem; font-weight:500; padding:4px 6px; border-radius:5px; background:#008919; color:#e6f5e9;",
+                            ),
+                            # Poor + slight → warning
+                            ui.div(
+                                ui.HTML(
+                                    '<svg width="11" height="11" viewBox="0 0 12 12"><path d="M2 3L6 9L10 3" fill="none" stroke="#4a3300" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+                                ),
+                                ui.span("Poor, slight"),
+                                style="display:flex; align-items:center; gap:5px; font-size:0.68rem; font-weight:500; padding:4px 6px; border-radius:5px; background:#f9b927; color:#4a3300;",
+                            ),
+                            # Poor + significant → danger
+                            ui.div(
+                                ui.HTML(
+                                    '<svg width="11" height="11" viewBox="0 0 12 12"><path d="M2 3L6 9L10 3" fill="none" stroke="#ffe8e8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+                                ),
+                                ui.span("Poor, signif."),
+                                style="display:flex; align-items:center; gap:5px; font-size:0.68rem; font-weight:500; padding:4px 6px; border-radius:5px; background:#c10000; color:#ffe8e8;",
+                            ),
+                            style="display:grid; grid-template-columns:1fr 1fr; gap:4px; margin-bottom:6px;",
+                        ),
+                        # Divider
+                        ui.hr(
+                            style="margin:4px 0 !important; border-color:rgba(0,0,0,0.12);"
+                        ),
+                        # Stable row
+                        ui.div(
+                            ui.HTML(
+                                '<svg width="11" height="11" viewBox="0 0 12 12"><path d="M2 6H10" stroke="#383d41" stroke-width="1.8" stroke-linecap="round"/></svg>'
+                            ),
+                            ui.span("Stable (<1% deviation)"),
+                            style="display:flex; align-items:center; justify-content:center; gap:5px; font-size:0.68rem; font-weight:500; padding:4px 6px; border-radius:5px; background:#404040; color:#f0f0f0;",
+                        ),
+                        style="padding:6px 8px; background:rgba(255,255,255,0.4); border-radius:8px; border:0.5px solid rgba(0,0,0,0.1); margin:4px 0;",
+                    ),
                     ui.hr(),
                     ui.div(
                         ui.markdown(
@@ -194,7 +288,7 @@ app_ui = ui.page_fluid(
                             ui.card_header("⚖️ Cost vs. Time Tradeoff by Mode"),
                             output_widget("plot_cost_time_faceted"),
                             full_screen=True,
-                            style="height:280px;",
+                            style="height:320px;",
                         ),
                         col_widths=[12, 12],
                     ),
@@ -236,17 +330,50 @@ app_ui = ui.page_fluid(
                         ui.card_header("💬 AI Assistant"),
                         chat_ui(id="ai_chat"),
                         ui.div(
-                            ui.h6("💡 Suggested Prompts:", style="margin-top: 10px; margin-bottom: 8px; font-weight: 600;"),
-                            ui.div(
-                                ui.input_action_button("prompt_expensive", "Top 10 most expensive", class_="btn-sm btn-outline-primary", style="margin: 3px;"),
-                                ui.input_action_button("prompt_defects", "Defect rate > 3%", class_="btn-sm btn-outline-primary", style="margin: 3px;"),
-                                ui.input_action_button("prompt_routes", "Top 10 cheapest routes", class_="btn-sm btn-outline-primary", style="margin: 3px;"),
-                                ui.input_action_button("prompt_quality", "Low defect rate < 2%", class_="btn-sm btn-outline-primary", style="margin: 3px;"),
-                                ui.input_action_button("prompt_cost_filter", "Cost over $50", class_="btn-sm btn-outline-primary", style="margin: 3px;"),
-                                ui.input_action_button("prompt_skincare", "Skincare products", class_="btn-sm btn-outline-primary", style="margin: 3px;"),
-                                style="display: flex; flex-wrap: wrap; gap: 2px;"
+                            ui.h6(
+                                "💡 Suggested Prompts:",
+                                style="margin-top: 10px; margin-bottom: 8px; font-weight: 600;",
                             ),
-                            style="padding: 10px; background-color: #f8f9fa; border-radius: 5px; margin-bottom: 10px;"
+                            ui.div(
+                                ui.input_action_button(
+                                    "prompt_expensive",
+                                    "Top 10 most expensive",
+                                    class_="btn-sm btn-outline-primary",
+                                    style="margin: 3px;",
+                                ),
+                                ui.input_action_button(
+                                    "prompt_defects",
+                                    "Defect rate > 3%",
+                                    class_="btn-sm btn-outline-primary",
+                                    style="margin: 3px;",
+                                ),
+                                ui.input_action_button(
+                                    "prompt_routes",
+                                    "Top 10 cheapest routes",
+                                    class_="btn-sm btn-outline-primary",
+                                    style="margin: 3px;",
+                                ),
+                                ui.input_action_button(
+                                    "prompt_quality",
+                                    "Low defect rate < 2%",
+                                    class_="btn-sm btn-outline-primary",
+                                    style="margin: 3px;",
+                                ),
+                                ui.input_action_button(
+                                    "prompt_cost_filter",
+                                    "Cost over $50",
+                                    class_="btn-sm btn-outline-primary",
+                                    style="margin: 3px;",
+                                ),
+                                ui.input_action_button(
+                                    "prompt_skincare",
+                                    "Skincare products",
+                                    class_="btn-sm btn-outline-primary",
+                                    style="margin: 3px;",
+                                ),
+                                style="display: flex; flex-wrap: wrap; gap: 2px;",
+                            ),
+                            style="padding: 10px; background-color: #f8f9fa; border-radius: 5px; margin-bottom: 10px;",
                         ),
                         full_screen=True,
                         style="height:550px;",
@@ -276,7 +403,7 @@ app_ui = ui.page_fluid(
                             class_="btn-success btn-lg",
                             width="100%",
                         ),
-                        style = "text-align: center; padding-bottom: 20px;"
+                        style="text-align: center; padding-bottom: 20px;",
                     ),
                     col_widths=[12],
                 ),
@@ -401,7 +528,7 @@ def server(input, output, session):
                     alt.Tooltip("Value:Q", format=".2f", title="Avg Value"),
                 ],
             )
-            .properties(width=600, height=170)
+            .properties(width=600, height=170, padding={"bottom": 10})
             .resolve_scale(y="independent")
         )
 
@@ -468,7 +595,11 @@ def server(input, output, session):
     @render_altair
     def plot_defect_sku():
         selection = alt.selection_point(
-            name="point", fields=["Supplier name"], on="click", toggle=True, clear="dblclick"
+            name="point",
+            fields=["Supplier name"],
+            on="click",
+            toggle=True,
+            clear="dblclick",
         )
         return (
             alt.Chart(filtered_data())
@@ -502,7 +633,10 @@ def server(input, output, session):
         input.clear_all()
         ui.update_select("input_supplier", selected="All")
         ui.update_select("input_product_type", selected="All")
-        ui.update_checkbox_group("input_transport_mode", selected=df["Transportation modes"].unique().tolist())
+        ui.update_checkbox_group(
+            "input_transport_mode",
+            selected=df["Transportation modes"].unique().tolist(),
+        )
 
     # ==================== AI Explorer ====================
 
@@ -512,7 +646,7 @@ def server(input, output, session):
         "prompt_routes": "Show top 10 cheapest shipping routes",
         "prompt_quality": "Show products with defect rate less than 2%",
         "prompt_cost_filter": "Show products with manufacturing cost over $50",
-        "prompt_skincare": "Show all skincare products"
+        "prompt_skincare": "Show all skincare products",
     }
 
     @reactive.effect
