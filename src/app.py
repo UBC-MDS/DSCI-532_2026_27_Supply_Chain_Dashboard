@@ -528,7 +528,7 @@ def server(input, output, session):
                     alt.Tooltip("Value:Q", format=".2f", title="Avg Value"),
                 ],
             )
-            .properties(width=600, height=160, padding={"bottom": 10})
+            .properties(width=600, height=170, padding={"bottom": 10})
             .resolve_scale(y="independent")
         )
 
