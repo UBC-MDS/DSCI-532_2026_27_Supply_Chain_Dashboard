@@ -288,7 +288,7 @@ app_ui = ui.page_fluid(
                             ui.card_header("⚖️ Cost vs. Time Tradeoff by Mode"),
                             output_widget("plot_cost_time_faceted"),
                             full_screen=True,
-                            style="height:280px;",
+                            style="height:320px;",
                         ),
                         col_widths=[12, 12],
                     ),
@@ -528,7 +528,7 @@ def server(input, output, session):
                     alt.Tooltip("Value:Q", format=".2f", title="Avg Value"),
                 ],
             )
-            .properties(width=600, height=170)
+            .properties(width=600, height=160, padding={"bottom": 10})
             .resolve_scale(y="independent")
         )
 
