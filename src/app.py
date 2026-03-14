@@ -421,6 +421,9 @@ def server(input, output, session):
     # Store for AI-filtered data
     ai_filtered_data_store = reactive.Value(df.copy())
 
+    # Store pending SQL query awaiting confirmation
+    pending_sql = reactive.Value(None)
+
     # Initialize Chat instance
     chat = Chat(id="ai_chat")
 
@@ -428,7 +431,9 @@ def server(input, output, session):
     @reactive.effect
     async def _():
         await chat.append_message(
-            "👋 Hi! I can help you filter and analyze the supply chain data. Try clicking a suggested prompt below or ask your own question!"
+            "👋 Hi! I can help you filter and analyze the supply chain data.\n\n"
+            "I'll generate SQL queries for you to review before execution.\n\n"
+            "Try clicking a suggested prompt below or ask your own question!"
         )
 
     @reactive.calc
@@ -681,28 +686,68 @@ def server(input, output, session):
 
     @chat.on_user_submit
     async def handle_chat_input():
-        """Handle user chat input"""
-        # Get user messages
+        """Handle user chat input with SQL confirmation flow"""
         user_messages = chat.messages()
         if not user_messages:
             return
 
-        # Get last user message
         user_query = user_messages[-1]["content"]
+        user_query_lower = user_query.strip().lower()
 
-        # Call AI engine
-        result = ai_engine.natural_language_to_filter(user_query, df)
+        # Check if user is confirming execution
+        if user_query_lower in ['yes', 'confirm', 'execute', 'y', 'ok']:
+            sql = pending_sql.get()
+            if sql:
+                try:
+                    filtered = ai_engine.execute_sql(con, sql)
+                    ai_filtered_data_store.set(filtered)
 
-        if result["success"] and result["filter_code"]:
-            # Apply filter
-            filtered = ai_engine.apply_filter(df, result["filter_code"])
-            ai_filtered_data_store.set(filtered)
+                    await chat.append_message(
+                        f"✅ **SQL executed successfully!**\n\n"
+                        f"📊 Found **{len(filtered)}** matching records (out of {len(df)} total)\n\n"
+                        f"Data table and charts have been updated - check the results below!"
+                    )
 
-            # AI response
+                    pending_sql.set(None)
+                except Exception as e:
+                    await chat.append_message(
+                        f"❌ **SQL execution failed:**\n\n"
+                        f"```\n{str(e)}\n```\n\n"
+                        f"Please try a different query."
+                    )
+                    pending_sql.set(None)
+            else:
+                await chat.append_message(
+                    "💡 No pending SQL query to execute. Please send a new query first."
+                )
+            return
+
+        # Check if user is canceling
+        if user_query_lower in ['no', 'cancel', 'abort', 'n']:
+            if pending_sql.get():
+                pending_sql.set(None)
+                await chat.append_message(
+                    "🚫 SQL query cancelled. You can send a new query anytime."
+                )
+            else:
+                await chat.append_message(
+                    "💡 No pending SQL query to cancel."
+                )
+            return
+
+        # Generate new SQL query
+        result = ai_engine.natural_language_to_sql(user_query, df)
+
+        if result["success"] and result["sql_query"]:
+            pending_sql.set(result["sql_query"])
+
             ai_response = (
-                f"✅ **{result['explanation']}**\n\n"
-                f"📊 Found **{len(filtered)}** matching records (out of {len(df)} total)\n\n"
-                f"Data table and charts have been updated - check the results below!"
+                f"🔍 **{result['explanation']}**\n\n"
+                f"**Generated SQL Query:**\n```sql\n{result['sql_query']}\n```\n\n"
+                f"⚠️ **Please review the SQL query above.**\n\n"
+                f"To execute this query, reply with:\n"
+                f"• **'yes'** or **'confirm'** or **'execute'** to run the query\n"
+                f"• **'no'** or **'cancel'** to abort"
             )
         else:
             ai_response = (
@@ -713,7 +758,6 @@ def server(input, output, session):
                 "• Click the suggested prompts below"
             )
 
-        # Append AI response
         await chat.append_message(ai_response)
 
     @render.data_frame
