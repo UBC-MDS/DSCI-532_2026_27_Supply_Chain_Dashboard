@@ -64,9 +64,43 @@ app_ui = ui.page_fluid(
     # Custom CSS stylesheet
     ui.head_content(
         ui.tags.link(rel="stylesheet", href="apple-style.css"),
-        # Aurora background orbs
-        ui.HTML(
-            """
+        ui.tags.style("""
+            /* Force the page to fit the viewport with no scroll */
+            html, body { height: 100vh; overflow: hidden; margin: 0; padding: 0; }
+            .container-fluid { height: 100vh; overflow: hidden; padding: 0 12px; }
+
+            /* Tighten card padding so charts get more room */
+            .card-body { padding: 4px !important; }
+            .card-header { padding: 4px 8px !important; font-size: 0.8rem; }
+
+            /* Remove excess margin from value boxes */
+            .value-box { min-height: 0 !important; }
+            .value-box .value-box-grid { padding: 6px 10px !important; }
+
+            /* Tighten sidebar internals */
+            .sidebar { padding: 20px !important; font-size: 0.85rem; }
+            .sidebar h5 { margin-bottom: 15px !important; font-size: 0.9rem; }
+            .sidebar .shiny-input-container { margin-bottom: 18px !important; }
+            label { font-size: 0.8rem !important; margin-bottom: 10px !important; }
+
+            /* Nav pills row — reduce vertical space */
+            .nav-pills { margin-bottom: 4px !important; }
+            .tab-content { overflow: hidden; }
+
+            /* Layout sidebar — fix height so it doesn't overflow */
+            .bslib-sidebar-layout {
+                height: calc(100vh - 90px) !important;
+                overflow: hidden;
+            }
+            .bslib-sidebar-layout > .main {
+                overflow: hidden;
+            }
+            /* Add space below Transportation Mode label */
+            .shiny-input-checkboxgroup > label {
+                margin-bottom: 15px !important;
+            }
+        """),
+        ui.HTML("""
             <div class="aurora-orb aurora-orb-1"></div>
             <div class="aurora-orb aurora-orb-2"></div>
             <div class="aurora-orb aurora-orb-3"></div>
@@ -75,7 +109,7 @@ app_ui = ui.page_fluid(
     ),
     ui.div(
         ui.panel_title("✨ Supply Chain Dashboard"),
-        style="margin-top: 15px; margin-bottom: 15px;",
+        style="margin: 6px 0; line-height: 1;",
     ),
     ui.navset_pill(
         ui.nav_panel(
@@ -99,6 +133,7 @@ app_ui = ui.page_fluid(
                         "Supplier",
                         ["All"] + sorted(df["Supplier name"].unique().tolist()),
                     ),
+                    ui.input_action_button("clear_all", "Reset Filters", class_="btn-primary btn-sm"),
                     ui.hr(),
                     ui.div(
                         ui.markdown(
@@ -107,49 +142,59 @@ app_ui = ui.page_fluid(
                             f"🔗 [View on GitHub](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard) • "
                             f"**Last Updated:** {date.today()}"
                         ),
-                        style="text-align: center; opacity: 0.8; font-size: 14px; margin-top: 250px;",
+                        style="text-align: center; opacity: 0.8; font-size: 12px;",
                     ),
                     open="desktop",
+                    width=300,
                 ),
                 ui.layout_columns(
+                    # LEFT COLUMN
                     ui.layout_columns(
+                        # KPI row
                         ui.layout_columns(
                             ui.output_ui("value_cost_unit"),
                             ui.output_ui("value_pass_rate"),
                             col_widths=[6, 6],
+                            style="height:70px;",
                         ),
+                        # Defect scatter
                         ui.card(
                             ui.card_header("🔍 Defect Rates by SKU"),
                             output_widget("plot_defect_sku"),
                             full_screen=True,
+                            style="height:270px;",
                         ),
+                        # Customer demo + Availability
                         ui.layout_columns(
                             ui.card(
                                 ui.card_header("👥 Customer Demographics"),
                                 output_widget("plot_customer_demo"),
                                 full_screen=True,
-                                height="200px",
+                                style="height:150px;",
                             ),
                             ui.card(
                                 ui.card_header("📦 Stock Availability"),
                                 output_widget("plot_availability"),
                                 full_screen=True,
-                                height="200px",
+                                style="height:150px;",
                             ),
                             col_widths=[6, 6],
                         ),
                         col_widths=[12, 12, 12],
                     ),
+                    # RIGHT COLUMN
                     ui.layout_columns(
                         ui.card(
                             ui.card_header("🌡️ Shipping Cost Matrix (Route vs. Mode)"),
                             output_widget("plot_route_heatmap"),
                             full_screen=True,
+                            style="height:250px;",
                         ),
                         ui.card(
                             ui.card_header("⚖️ Cost vs. Time Tradeoff by Mode"),
                             output_widget("plot_cost_time_faceted"),
                             full_screen=True,
+                            style="height:280px;",
                         ),
                         col_widths=[12, 12],
                     ),
@@ -204,7 +249,7 @@ app_ui = ui.page_fluid(
                             style="padding: 10px; background-color: #f8f9fa; border-radius: 5px; margin-bottom: 10px;"
                         ),
                         full_screen=True,
-                        height="550px",
+                        style="height:550px;",
                     ),
                     ui.card(
                         ui.card_header("📋 Filtered Results"),
@@ -224,11 +269,14 @@ app_ui = ui.page_fluid(
                     col_widths=[12, 12, 6, 6],
                 ),
                 ui.layout_columns(
-                    ui.download_button(
-                        "download_ai_filtered",
-                        "⬇ Download Filtered Data (CSV)",
-                        class_="btn-success btn-lg",
-                        width="100%",
+                    ui.div(
+                        ui.download_button(
+                            "download_ai_filtered",
+                            "⬇ Download Filtered Data (CSV)",
+                            class_="btn-success btn-lg",
+                            width="100%",
+                        ),
+                        style = "text-align: center; padding-bottom: 20px;"
                     ),
                     col_widths=[12],
                 ),
@@ -420,17 +468,18 @@ def server(input, output, session):
     @render_altair
     def plot_defect_sku():
         selection = alt.selection_point(
-            name="point", fields=["Supplier name"], on="click"
+            name="point", fields=["Supplier name"], on="click", toggle=True, clear="dblclick"
         )
         return (
-            alt.Chart(df)
-            .mark_circle(size=80)
+            alt.Chart(filtered_data())
+            .mark_point(size=80, filled=True)
             .encode(
                 x=alt.X("SKU:N", axis=alt.Axis(labels=False), title="SKUs"),
                 y=alt.Y("Defect rates:Q", title="Defect Rate (%)"),
                 color=alt.Color(
                     "Supplier name:N", scale=alt.Scale(range=CP), title="Supplier"
                 ),
+                shape=alt.Shape("Supplier name:N", title="Supplier"),
                 opacity=alt.condition(selection, alt.value(1.0), alt.value(0.10)),
                 tooltip=[
                     "SKU",
@@ -439,7 +488,7 @@ def server(input, output, session):
                 ],
             )
             .add_params(selection)
-            .properties(width="container", height=400)
+            .properties(width="container", height=300)
         )
 
     @reactive.effect
@@ -447,8 +496,13 @@ def server(input, output, session):
         pt = reactive_read(plot_defect_sku.widget.selections, "point")
         if pt and pt.value:
             ui.update_select("input_supplier", selected=pt.value[0]["Supplier name"])
-        else:
-            ui.update_select("input_supplier", selected="All")
+
+    @reactive.effect
+    def reset_button():
+        input.clear_all()
+        ui.update_select("input_supplier", selected="All")
+        ui.update_select("input_product_type", selected="All")
+        ui.update_checkbox_group("input_transport_mode", selected=df["Transportation modes"].unique().tolist())
 
     # ==================== AI Explorer ====================
 
