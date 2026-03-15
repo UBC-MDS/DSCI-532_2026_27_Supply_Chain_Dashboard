@@ -322,78 +322,86 @@ app_ui = ui.page_fluid(
                     ui.hr(),
                     ui.markdown("**📊 Session Statistics**"),
                     ui.output_text_verbatim("query_stats"),
-                    open="desktop",
+                    open="closed",
                     width=350,
                 ),
                 ui.layout_columns(
+                    # Left column: AI Assistant
                     ui.card(
                         ui.card_header("💬 AI Assistant"),
                         chat_ui(id="ai_chat"),
                         ui.div(
-                            ui.h6(
-                                "💡 Suggested Prompts:",
-                                style="margin-top: 10px; margin-bottom: 8px; font-weight: 600;",
-                            ),
                             ui.div(
+                                ui.span("💡 Quick:", style="font-weight: 600; margin-right: 8px;"),
                                 ui.input_action_button(
                                     "prompt_expensive",
                                     "Top 10 most expensive",
                                     class_="btn-sm btn-outline-primary",
-                                    style="margin: 3px;",
+                                    style="margin: 2px;",
                                 ),
                                 ui.input_action_button(
                                     "prompt_defects",
                                     "Defect rate > 3%",
                                     class_="btn-sm btn-outline-primary",
-                                    style="margin: 3px;",
+                                    style="margin: 2px;",
                                 ),
                                 ui.input_action_button(
                                     "prompt_routes",
                                     "Top 10 cheapest routes",
                                     class_="btn-sm btn-outline-primary",
-                                    style="margin: 3px;",
+                                    style="margin: 2px;",
                                 ),
                                 ui.input_action_button(
                                     "prompt_quality",
                                     "Low defect rate < 2%",
                                     class_="btn-sm btn-outline-primary",
-                                    style="margin: 3px;",
+                                    style="margin: 2px;",
                                 ),
                                 ui.input_action_button(
                                     "prompt_cost_filter",
                                     "Cost over $50",
                                     class_="btn-sm btn-outline-primary",
-                                    style="margin: 3px;",
+                                    style="margin: 2px;",
                                 ),
                                 ui.input_action_button(
                                     "prompt_skincare",
                                     "Skincare products",
                                     class_="btn-sm btn-outline-primary",
-                                    style="margin: 3px;",
+                                    style="margin: 2px;",
                                 ),
-                                style="display: flex; flex-wrap: wrap; gap: 2px;",
+                                style="display: flex; flex-wrap: wrap; gap: 2px; align-items: center;",
                             ),
-                            style="padding: 10px; background-color: #f8f9fa; border-radius: 5px; margin-bottom: 10px;",
+                            style="padding: 6px 8px; background-color: #f8f9fa; border-radius: 5px; margin-bottom: 6px;",
                         ),
                         full_screen=True,
-                        style="height:550px;",
+                        style="height:calc(100vh - 150px);",
                     ),
-                    ui.card(
-                        ui.card_header("📋 Filtered Results"),
-                        ui.output_data_frame("ai_filtered_table"),
-                        full_screen=True,
+                    # Right column: stacked cards
+                    ui.layout_columns(
+                        ui.card(
+                            ui.card_header("📋 Filtered Results"),
+                            ui.output_data_frame("ai_filtered_table"),
+                            full_screen=True,
+                            style="height:calc((100vh - 150px) / 2 - 10px);",
+                        ),
+                        ui.layout_columns(
+                            ui.card(
+                                ui.card_header("📊 Defect Rate by Supplier"),
+                                output_widget("ai_plot_defects"),
+                                full_screen=True,
+                                style="height:calc((100vh - 150px) / 2 - 10px);",
+                            ),
+                            ui.card(
+                                ui.card_header("💰 Shipping Cost Distribution"),
+                                output_widget("ai_plot_costs"),
+                                full_screen=True,
+                                style="height:calc((100vh - 150px) / 2 - 10px);",
+                            ),
+                            col_widths=[6, 6],
+                        ),
+                        col_widths=[12, 12],
                     ),
-                    ui.card(
-                        ui.card_header("📊 Defect Rate by Supplier"),
-                        output_widget("ai_plot_defects"),
-                        full_screen=True,
-                    ),
-                    ui.card(
-                        ui.card_header("💰 Shipping Cost Distribution"),
-                        output_widget("ai_plot_costs"),
-                        full_screen=True,
-                    ),
-                    col_widths=[12, 12, 6, 6],
+                    col_widths=[6, 6],
                 ),
                 ui.layout_columns(
                     ui.div(
@@ -421,6 +429,9 @@ def server(input, output, session):
     # Store for AI-filtered data
     ai_filtered_data_store = reactive.Value(df.copy())
 
+    # Store pending SQL query awaiting confirmation
+    pending_sql = reactive.Value(None)
+
     # Initialize Chat instance
     chat = Chat(id="ai_chat")
 
@@ -428,7 +439,7 @@ def server(input, output, session):
     @reactive.effect
     async def _():
         await chat.append_message(
-            "👋 Hi! I can help you filter and analyze the supply chain data. Try clicking a suggested prompt below or ask your own question!"
+            "👋 Ask me to filter and analyze data. I'll generate SQL queries for your review first!"
         )
 
     @reactive.calc
@@ -681,28 +692,68 @@ def server(input, output, session):
 
     @chat.on_user_submit
     async def handle_chat_input():
-        """Handle user chat input"""
-        # Get user messages
+        """Handle user chat input with SQL confirmation flow"""
         user_messages = chat.messages()
         if not user_messages:
             return
 
-        # Get last user message
         user_query = user_messages[-1]["content"]
+        user_query_lower = user_query.strip().lower()
 
-        # Call AI engine
-        result = ai_engine.natural_language_to_filter(user_query, df)
+        # Check if user is confirming execution
+        if user_query_lower in ['yes', 'confirm', 'execute', 'y', 'ok']:
+            sql = pending_sql.get()
+            if sql:
+                try:
+                    filtered = ai_engine.execute_sql(con, sql)
+                    ai_filtered_data_store.set(filtered)
 
-        if result["success"] and result["filter_code"]:
-            # Apply filter
-            filtered = ai_engine.apply_filter(df, result["filter_code"])
-            ai_filtered_data_store.set(filtered)
+                    await chat.append_message(
+                        f"✅ **SQL executed successfully!**\n\n"
+                        f"📊 Found **{len(filtered)}** matching records (out of {len(df)} total)\n\n"
+                        f"Data table and charts have been updated - check the results below!"
+                    )
 
-            # AI response
+                    pending_sql.set(None)
+                except Exception as e:
+                    await chat.append_message(
+                        f"❌ **SQL execution failed:**\n\n"
+                        f"```\n{str(e)}\n```\n\n"
+                        f"Please try a different query."
+                    )
+                    pending_sql.set(None)
+            else:
+                await chat.append_message(
+                    "💡 No pending SQL query to execute. Please send a new query first."
+                )
+            return
+
+        # Check if user is canceling
+        if user_query_lower in ['no', 'cancel', 'abort', 'n']:
+            if pending_sql.get():
+                pending_sql.set(None)
+                await chat.append_message(
+                    "🚫 SQL query cancelled. You can send a new query anytime."
+                )
+            else:
+                await chat.append_message(
+                    "💡 No pending SQL query to cancel."
+                )
+            return
+
+        # Generate new SQL query
+        result = ai_engine.natural_language_to_sql(user_query, df)
+
+        if result["success"] and result["sql_query"]:
+            pending_sql.set(result["sql_query"])
+
             ai_response = (
-                f"✅ **{result['explanation']}**\n\n"
-                f"📊 Found **{len(filtered)}** matching records (out of {len(df)} total)\n\n"
-                f"Data table and charts have been updated - check the results below!"
+                f"🔍 **{result['explanation']}**\n\n"
+                f"**Generated SQL Query:**\n```sql\n{result['sql_query']}\n```\n\n"
+                f"⚠️ **Please review the SQL query above.**\n\n"
+                f"To execute this query, reply with:\n"
+                f"• **'yes'** or **'confirm'** or **'execute'** to run the query\n"
+                f"• **'no'** or **'cancel'** to abort"
             )
         else:
             ai_response = (
@@ -713,14 +764,13 @@ def server(input, output, session):
                 "• Click the suggested prompts below"
             )
 
-        # Append AI response
         await chat.append_message(ai_response)
 
     @render.data_frame
     def ai_filtered_table():
         """Display AI-filtered data"""
         return render.DataTable(
-            ai_filtered_data_store.get(), height="450px", width="100%"
+            ai_filtered_data_store.get(), height="100%", width="100%"
         )
 
     @render_altair
