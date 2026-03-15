@@ -322,78 +322,86 @@ app_ui = ui.page_fluid(
                     ui.hr(),
                     ui.markdown("**📊 Session Statistics**"),
                     ui.output_text_verbatim("query_stats"),
-                    open="desktop",
+                    open="closed",
                     width=350,
                 ),
                 ui.layout_columns(
+                    # Left column: AI Assistant
                     ui.card(
                         ui.card_header("💬 AI Assistant"),
                         chat_ui(id="ai_chat"),
                         ui.div(
-                            ui.h6(
-                                "💡 Suggested Prompts:",
-                                style="margin-top: 10px; margin-bottom: 8px; font-weight: 600;",
-                            ),
                             ui.div(
+                                ui.span("💡 Quick:", style="font-weight: 600; margin-right: 8px;"),
                                 ui.input_action_button(
                                     "prompt_expensive",
                                     "Top 10 most expensive",
                                     class_="btn-sm btn-outline-primary",
-                                    style="margin: 3px;",
+                                    style="margin: 2px;",
                                 ),
                                 ui.input_action_button(
                                     "prompt_defects",
                                     "Defect rate > 3%",
                                     class_="btn-sm btn-outline-primary",
-                                    style="margin: 3px;",
+                                    style="margin: 2px;",
                                 ),
                                 ui.input_action_button(
                                     "prompt_routes",
                                     "Top 10 cheapest routes",
                                     class_="btn-sm btn-outline-primary",
-                                    style="margin: 3px;",
+                                    style="margin: 2px;",
                                 ),
                                 ui.input_action_button(
                                     "prompt_quality",
                                     "Low defect rate < 2%",
                                     class_="btn-sm btn-outline-primary",
-                                    style="margin: 3px;",
+                                    style="margin: 2px;",
                                 ),
                                 ui.input_action_button(
                                     "prompt_cost_filter",
                                     "Cost over $50",
                                     class_="btn-sm btn-outline-primary",
-                                    style="margin: 3px;",
+                                    style="margin: 2px;",
                                 ),
                                 ui.input_action_button(
                                     "prompt_skincare",
                                     "Skincare products",
                                     class_="btn-sm btn-outline-primary",
-                                    style="margin: 3px;",
+                                    style="margin: 2px;",
                                 ),
-                                style="display: flex; flex-wrap: wrap; gap: 2px;",
+                                style="display: flex; flex-wrap: wrap; gap: 2px; align-items: center;",
                             ),
-                            style="padding: 10px; background-color: #f8f9fa; border-radius: 5px; margin-bottom: 10px;",
+                            style="padding: 6px 8px; background-color: #f8f9fa; border-radius: 5px; margin-bottom: 6px;",
                         ),
                         full_screen=True,
-                        style="height:550px;",
+                        style="height:calc(100vh - 150px);",
                     ),
-                    ui.card(
-                        ui.card_header("📋 Filtered Results"),
-                        ui.output_data_frame("ai_filtered_table"),
-                        full_screen=True,
+                    # Right column: stacked cards
+                    ui.layout_columns(
+                        ui.card(
+                            ui.card_header("📋 Filtered Results"),
+                            ui.output_data_frame("ai_filtered_table"),
+                            full_screen=True,
+                            style="height:calc((100vh - 150px) / 2 - 10px);",
+                        ),
+                        ui.layout_columns(
+                            ui.card(
+                                ui.card_header("📊 Defect Rate by Supplier"),
+                                output_widget("ai_plot_defects"),
+                                full_screen=True,
+                                style="height:calc((100vh - 150px) / 2 - 10px);",
+                            ),
+                            ui.card(
+                                ui.card_header("💰 Shipping Cost Distribution"),
+                                output_widget("ai_plot_costs"),
+                                full_screen=True,
+                                style="height:calc((100vh - 150px) / 2 - 10px);",
+                            ),
+                            col_widths=[6, 6],
+                        ),
+                        col_widths=[12, 12],
                     ),
-                    ui.card(
-                        ui.card_header("📊 Defect Rate by Supplier"),
-                        output_widget("ai_plot_defects"),
-                        full_screen=True,
-                    ),
-                    ui.card(
-                        ui.card_header("💰 Shipping Cost Distribution"),
-                        output_widget("ai_plot_costs"),
-                        full_screen=True,
-                    ),
-                    col_widths=[12, 12, 6, 6],
+                    col_widths=[6, 6],
                 ),
                 ui.layout_columns(
                     ui.div(
@@ -431,9 +439,7 @@ def server(input, output, session):
     @reactive.effect
     async def _():
         await chat.append_message(
-            "👋 Hi! I can help you filter and analyze the supply chain data.\n\n"
-            "I'll generate SQL queries for you to review before execution.\n\n"
-            "Try clicking a suggested prompt below or ask your own question!"
+            "👋 Ask me to filter and analyze data. I'll generate SQL queries for your review first!"
         )
 
     @reactive.calc
@@ -764,7 +770,7 @@ def server(input, output, session):
     def ai_filtered_table():
         """Display AI-filtered data"""
         return render.DataTable(
-            ai_filtered_data_store.get(), height="450px", width="100%"
+            ai_filtered_data_store.get(), height="100%", width="100%"
         )
 
     @render_altair
