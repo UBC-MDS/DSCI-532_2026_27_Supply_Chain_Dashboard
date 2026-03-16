@@ -162,7 +162,7 @@ By implementing filtering in a single reactive calculation rather than duplicati
 
 ## Revision History
 
-**v1.0 (2026-02-XX):** Initial specification with 12 core components
-**v1.1 (2026-02-XX):** Updated to reflect actual implementation including Data tab components (15 total components)
-**v1.2 (2026-03-XX):** Updated to reflect click event interactions in the `plot_defect_sku` scatterplot
-**v1.3 (2026-03-XX):** Added reset button and fixed SKU plot filtering issue
+**v1.0 (2026-02-14):** Initial specification with 12 core components
+**v1.1 (2026-02-28):** Updated to reflect actual implementation including Data tab components (15 total components)
+**v1.2 (2026-03-08):** Updated to reflect click event interactions in the `plot_defect_sku` scatterplot
+**v1.3 (2026-03-16):** Added reset button and fixed SKU plot filtering issue

@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [0.4.0] - 2026-03-15
+## [0.4.0] - 2026-03-16
 
 ### Added
 
@@ -175,7 +175,8 @@ This release establishes the foundation for the Supply Chain Dashboard project, 
 ---
 
 ## Release History
-
+- [0.4.0] - Addressing peer feedback, polishing dashboard layout and refining the logic for the AI Explorer (Milestone 4)
+- [0.3.0] - Additional AI Explorer functionality added (Milestone 3)
 - [0.2.0] - Dashboard prototype with full functionality (Milestone 2)
 - [0.0.1] - Initial project setup and skeleton app (Milestone 1)
 
