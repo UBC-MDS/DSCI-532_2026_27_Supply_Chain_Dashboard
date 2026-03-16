@@ -31,8 +31,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed issues with AI Explorer ([#80](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/pull/80))
 
 ### Known Issues
+- N/A
 
 ### Release Highlight
+- Our motivation this milestone was to address feedback from our peers and polish existing features. This ranged from performance improvements in our AI Explorer, to adding a legend to better understand our KPI cards.
+
 - Overhauled the UI and logic of the AI Explorer tab
 - Refined the dashbaord's layout to make visuals easier to understand (e.g. adding a color legend for KPI cards) and use (e.g. removing the need to scroll on the dashboard)
 - Created unit and UI tests for more secure future development
