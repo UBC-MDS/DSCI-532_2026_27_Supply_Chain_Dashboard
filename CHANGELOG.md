@@ -14,21 +14,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Makefile` for test setup + running tests ([#61](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/61))
 - Created `compare.py` by extracting `def compare()` to its own file to enable testing ([#61](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/61))
 - `test_ui.py` for end to end tests ([#61](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/61))
-- Added Parquet and DuckDB database retrieval functionality ([#59](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/59))
-- Added reset button for sidebar filters ([#82](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/pull/82))
-- Added faceting by shapes in SKU scatterplot([#71](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/pull/71))
+- Parquet and DuckDB database retrieval functionality ([#59](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/59))
+- Reset button for sidebar filters ([#82](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/pull/82))
+- Faceting by shapes in SKU scatterplot([#71](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/pull/71))
 
 ### Changed
 
 - Updated `requirements.txt` to include `pytest` and `pytest-playwright` ([#61](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/61))
 - `README` instructions ([#63](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/63))
-- Changed width of facet charts to prevent horizontal scrolling ([#76](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/76))
-- Changed dashboard widget widths to remove the need for scrolling([#79](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/79))
+- Width of facet charts to prevent horizontal scrolling ([#76](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/76))
+- Dashboard widget widths to remove the need for scrolling([#79](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/79))
 
 ### Fixed
-- Fixed SKU scatterplot not filtering when clicking sidebar after click event implementation ([#77](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/77))
-- Fixed issue with filters not being applied to SKU scatterplot ([#83](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/pull/83))
-- Fixed issues with AI Explorer ([#80](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/pull/80))
+- SKU scatterplot not filtering when clicking sidebar after click event implementation ([#77](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/issues/77))
+- Issue with filters not being applied to SKU scatterplot ([#83](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/pull/83))
+- Issues with AI Explorer ([#80](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/pull/80))
 
 ### Known Issues
 - N/A
@@ -42,8 +42,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Collaboration
 - **CONTRIBUTING.md:**: Updated in PR [#73](https://github.com/UBC-MDS/DSCI-532_2026_27_Supply_Chain_Dashboard/pull/73)
-- **M3 retrospective:**: After reviewing the collaboration feedback with the group, the biggest change we made was enforcing the policy of 1 review per PR. Unexpectedly, it did not significantly impact the speed of development because we were all on top of replying to Slack messages and letting each other know when a PR was created and what it aimed to accomplish.
-- **M4:**: In this Milestone, we tried implementing a short meeting at the start of the lab working session so everyone was caught up with each other's progress and what issues were outstanding. This worked quite well in ensuring everyone was clear on what the priority items were, as well as giving members a chance to bring up any concerns with workload or open PR's that still needed reviewing.
+- **M3 retrospective:**: After reviewing the collaboration feedback with the group, the biggest change we made was enforcing the policy of at least 1 review per PR. Unexpectedly, it did not significantly impact the speed of development because we were all on top of replying to Slack messages and letting each other know when a PR was created and what it aimed to accomplish.
+- **M4:**: In this Milestone, we tried implementing a short meeting at the start of the lab working session so everyone was caught up with each other's progress and what issues were outstanding. This worked quite well in ensuring everyone was clear on what the priority items were, as well as giving members a chance to bring up any concerns with workload or open PRs that still needed reviewing.
 
 ### Reflection
 
