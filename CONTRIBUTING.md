@@ -275,18 +275,24 @@ def load_supply_chain_data(file_path: str) -> pd.DataFrame:
 
 ## Testing
 
-### Running Tests
+This project uses `pytest` for unit testing logic and `Playwright` for E2E UI testing.
+
+### Prerequisites
+1. `pip install -r requirements.txt`
+2. `playwright install chromium`
+
+### Running the Suite
+To run all tests (Unit + UI), ensure the app is running in the background:
+1. Start the app: `shiny run src/app.py`
+2. Run tests: `pytest` (Make sure to open a browser and go to `localhost:8000`)
+
+### Makefile
+Alternatively, use the `Makefile` to do the installation and testing in a **single command**. Run the below command:
 
 ```bash
-# Run all tests
-pytest
-
-# Run specific test file
-pytest tests/test_data_processing.py
-
-# Run with coverage
-pytest --cov=src tests/
+make test-all
 ```
+You should see that 9 tests have passed successfully.
 
 ### Writing Tests
 
@@ -401,7 +407,11 @@ We appreciate your contributions to making supply chain management more data-dri
 ## Milestone 3 Retrospective and Milestone 4 Norms
 Overall, I think our team worked well so far in the project. Everyone has shown that they are committed to completing their deliverables far in advance of the deadline, as described in the Team Charter we agreed on at the beginning of the project. No issues were encountered regarding team communication. Everyone has been responsive on Slack and to feedback that we provide each other either in passing or as a comment on Pull Requests. The team has been good about communicating times of unavailability and it has not led to anyone having to step in and "pick up the slack" of another team member. 
 
-One thing we could improve on is having more structure to the working session during lab time. Over the past weeks it was observed that the lab time working session was more of a scramble to tie up any loose ends, which resulted in more time than needed being dedicated to deciding what everyone will be working on versus actually doing the work. For our last lab session, we are planning to implement the following agenda:
+One thing we could improve on is having more structure to the working session during lab time. Over the past weeks it was observed that the lab time working session was more of a scramble to tie up any loose ends, which resulted in more time than needed being dedicated to deciding what everyone will be working on versus actually doing the work. 
+
+### M4 Collaboration
+
+For our last lab session, we are planning to implement the following agenda:
 1. Greetings and catch-up (5 minutes)
 2. Pressing issues and questions (5 minutes)
 3. Progress update on outstanding items or assignment of outstanding items (10 minutes)
