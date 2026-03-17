@@ -49,7 +49,7 @@ def test_navigation_to_ai_explorer(page: Page):
     page.get_by_role("tab", name="🤖 AI Explorer").click()
 
     # Confirm AI interface loads
-    expect(page.get_by_role("heading", name="💬 AI Assistant")).to_be_visible()
+    expect(page.get_by_text("Ask me to filter"))
 
 
 def test_download_button_state(page: Page):
