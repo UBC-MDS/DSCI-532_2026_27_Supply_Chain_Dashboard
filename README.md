@@ -51,6 +51,26 @@ If you've made changes to the `dev` branch and have the pull request approved (a
 
 Once a new release is published, the most recent commits will be visible in the stable version of our dashboard (`main` branch), accessible [here](https://019c9b42-3095-b6d6-0bde-f47f0f78a6be.share.connect.posit.cloud)
 
+## Testing & Quality Assurance
+This project uses `pytest` for unit testing logic and `Playwright` for E2E UI testing.
+
+### Prerequisites
+1. `pip install -r requirements.txt`
+2. `playwright install chromium`
+
+### Running the Suite
+To run all tests (Unit + UI), ensure the app is running in the background:
+1. Start the app: `shiny run src/app.py`
+2. Run tests: `pytest` (Make sure to open a browser and go to `localhost:8000`)
+
+### Makefile
+Alternatively, use the `Makefile` to do the installation and testing in a **single command**. Run the below command:
+
+```bash
+make test-all
+```
+You should see that 7 tests have passed successfully.
+
 ## Contributing
 
 Interested in contributing? Check out the [CONTRIBUTING.md](CONTRIBUTING.md) file for guidelines on how to contribute to this project.

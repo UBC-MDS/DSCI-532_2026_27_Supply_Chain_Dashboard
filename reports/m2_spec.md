@@ -11,7 +11,7 @@ The following job stories guide our dashboard design and implementation:
 | #   | Job Story                                                                                                                                  | Status         | Notes                                                                                    |
 | --- | ------------------------------------------------------------------------------------------------------------------------------------------ | -------------- | ---------------------------------------------------------------------------------------- |
 | 1   | When reviewing quarterly cost reports, I want to filter shipments by transportation mode and route so I can identify cost-effective methods | ✅ Implemented | Core filtering functionality implemented with checkbox group and visualization           |
-| 2   | When evaluating supplier performance, I want to compare defect rates across suppliers and locations so I can make sourcing decisions      | ✅ Implemented | Supplier dropdown and defect rate scatter plot implemented                               |
+| 2   | When evaluating supplier performance, I want to compare defect rates across suppliers and locations so I can make sourcing decisions      | ✅ Implemented | Supplier dropdown and defect rate scatter plot implemented with filtering when clicking on a point on the plot                              |
 | 3   | When planning inventory levels, I want to visualize the relationship between lead times and stock levels so I can optimize buffer stock   | 🔄 Revised     | Refocused on stock availability visualization instead of lead time relationships         |
 | 4   | When monitoring overall business performance, I want to see high-level KPI metrics so I can track operational health                      | 🔄 Revised     | Changed from revenue/sales KPIs to inspection pass rate and manufacturing cost per unit  |
 
@@ -19,19 +19,20 @@ The following job stories guide our dashboard design and implementation:
 
 ## 2.2 Component Inventory
 
-The dashboard contains **15 components** organized into two tabs (Dashboard and Data), exceeding the minimum requirement of 8 components for a 4-person team:
+The dashboard contains **16 components** organized into two tabs (Dashboard and Data), exceeding the minimum requirement of 8 components for a 4-person team:
 
-### Dashboard Tab - Core Components (12 components)
+### Dashboard Tab - Core Components (13 components)
 
 | ID                      | Type          | Shiny widget / renderer          | Depends on                                                   | Job story  |
 | ----------------------- | ------------- | -------------------------------- | ------------------------------------------------------------ | ---------- |
 | `input_transport_mode`  | Input         | `ui.input_checkbox_group()`      | —                                                            | #1         |
 | `input_product_type`    | Input         | `ui.input_select()`              | —                                                            | #1, #3, #4 |
 | `input_supplier`        | Input         | `ui.input_select()`              | —                                                            | #2         |
+| `clear_all`             | Input         | `ui.input_action_button()`       | —                                                            | #1, #2, #3, #4 |
 | `filtered_data`         | Reactive calc | `@reactive.calc`                 | `input_transport_mode`, `input_product_type`, `input_supplier` | #1, #2, #3, #4 |
 | `plot_route_heatmap`    | Output        | `@render_altair` (Altair)        | `filtered_data`                                              | #1         |
 | `plot_cost_time_faceted`| Output        | `@render_altair` (Altair)        | `filtered_data`                                              | #1         |
-| `plot_defect_sku`       | Output        | `@render_altair` (Altair)        | `filtered_data`                                              | #2         |
+| `plot_defect_sku`       | Output        | `@render_altair` (Altair)        | `filtered_data`                                                         | #2         |
 | `plot_customer_demo`    | Output        | `@render_altair` (Altair)        | `filtered_data`                                              | #4         |
 | `plot_availability`     | Output        | `@render_altair` (Altair)        | `filtered_data`                                              | #3         |
 | `value_cost_unit`       | Output        | `ui.value_box()` with `@render.ui` | `filtered_data`                                            | #4         |
@@ -49,8 +50,8 @@ These components were added during implementation to enhance data exploration ca
 | `download_view`   | Output | `@render.download`         | `filtered_data` | All       |
 
 **Component Summary:**
-- **Total components:** 15 (4 inputs, 1 reactive calc, 10 outputs)
-- **Core Dashboard components:** 12 (3 inputs, 1 reactive calc, 8 outputs)
+- **Total components:** 16 (5 inputs, 1 reactive calc, 10 outputs)
+- **Core Dashboard components:** 13 (4 inputs, 1 reactive calc, 8 outputs)
 - **Data exploration components:** 3 (1 input, 2 outputs)
 
 **Notes:**
@@ -72,10 +73,14 @@ flowchart TD
     A[/input_transport_mode/] --> F{{filtered_data}}
     B[/input_product_type/] --> F
     C[/input_supplier/] --> F
+    RST[/clear_all/] --> A
+    RST --> B
+    RST --> C
+    F --> P3([plot_defect_sku])
+    P3 --> |click| C
 
     F --> P1([plot_route_heatmap])
     F --> P2([plot_cost_time_faceted])
-    F --> P3([plot_defect_sku])
     F --> P4([plot_customer_demo])
     F --> P5([plot_availability])
     F --> V1([value_cost_unit])
@@ -126,10 +131,11 @@ This design follows best practices from Lecture 3 by:
 5. Returns the filtered pandas DataFrame
 
 **Output consumers:**
-All 8 core outputs consume `filtered_data`:
-- **Visualizations:** `plot_route_heatmap`, `plot_cost_time_faceted`, `plot_defect_sku`, `plot_customer_demo`, `plot_availability`
+8 core outputs consume `filtered_data`:
+- **Visualizations:** `plot_route_heatmap`, `plot_cost_time_faceted`, `plot_customer_demo`, `plot_availability`, `plot_defect_sku` (updates `input_supplier` on click)
 - **KPI metrics:** `value_cost_unit`, `value_pass_rate`
 - **Data table:** `table`
+
 
 **Performance consideration:**
 By implementing filtering in a single reactive calculation rather than duplicating the logic across 8 separate outputs, the dashboard ensures optimal performance. When a user changes any filter, the data is processed once and the result is efficiently distributed to all dependent components.
@@ -156,9 +162,7 @@ By implementing filtering in a single reactive calculation rather than duplicati
 
 ## Revision History
 
-**v1.0 (2026-02-XX):** Initial specification with 12 core components
-**v1.1 (2026-02-XX):** Updated to reflect actual implementation including Data tab components (15 total components)
-
----
-
-_This specification will be updated in Milestones 3 and 4 as new features are added or design decisions evolve._
+**v1.0 (2026-02-14):** Initial specification with 12 core components
+**v1.1 (2026-02-28):** Updated to reflect actual implementation including Data tab components (15 total components)
+**v1.2 (2026-03-08):** Updated to reflect click event interactions in the `plot_defect_sku` scatterplot
+**v1.3 (2026-03-16):** Added reset button and fixed SKU plot filtering issue
